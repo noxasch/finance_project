@@ -1,3 +1,4 @@
+'use strict';
 const toggle = document.getElementById('right-toggle');
 const rightMenu = document.querySelector('.grid-container__right');
 

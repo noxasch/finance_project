@@ -2,6 +2,7 @@
 
 const path = require('path');
 const { app, BrowserWindow } = require('electron');
+const Database = require('better-sqlite3');
 const { DummyDB } = require('./model');
 const registerListener = require('./main.listener');
 
@@ -57,6 +58,14 @@ function initMain() {
 //  - create mainWindow 
 // main
 initMain();
+const db = new Database('people.db');
+
+const stmt = db.prepare('SELECT COUNT(*) FROM sqlite_master WHERE type=?');
+console.log(stmt.get('table'));
+// const db = new sqlite3.Database(':memory:', (err) => {
+//   if (err) console.err(err);
+//   else console.log('success');
+// });
 
 process.on('uncaughtException', (err) => {
   console.error((new Date).toLocaleString(), 'Uncaught Exception:', err.message);

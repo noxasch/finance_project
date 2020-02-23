@@ -5,7 +5,8 @@
   "main": "src/js/main.js",
   "scripts": {
     "start": "electron .",
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "build": "electron-rebuild"
   },
   "repository": {
     "type": "git",
@@ -27,7 +28,7 @@
     "jest": "^25.1.0"
   },
   "dependencies": {
-    "chart.js": "^2.9.3",
-    "sqlite3": "^4.1.1"
+    "better-sqlite3": "^5.4.3",
+    "chart.js": "^2.9.3"
   }
 }

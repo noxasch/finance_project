@@ -4,6 +4,7 @@ const { ipcRenderer, remote } = require('electron');
 // const remote = require('electron').remote;
 const { TransactionHelper } = require('./transaction.helper');
 const { TransactionInput } = require('./transaction.input');
+const { formValidated } = require('./form.validate.helper');
 
 const UIdialogController = (function () {
   let transaction = null;
@@ -63,15 +64,6 @@ TransactionInput.resetTransactionOption();
 TransactionInput.addTransactionOptionListener();
 TransactionInput.addAmountInputListener();
 UIdialogController.addCancelButtonListener();
-
-function formValidated(results = {}) {
-  if (results.amount === '' || results.amount === undefined) {
-    document.getElementById('amount-input').setCustomValidity('amount cannot be empty.');
-    document.getElementById('amount-input').reportValidity();
-    return false;
-  }
-  return true;
-}
 
 const transactionForm = document.getElementById(UIdialogController.getSelectors().form);
 transactionForm.addEventListener('submit', (e) => {

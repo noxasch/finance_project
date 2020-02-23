@@ -45,7 +45,10 @@ const DummyDB = (function() {
     transferId: null
   }];
 
-  let account = ['Wallet'];
+  let account = [
+    { name: 'Wallet', iconId: 1},
+    { name: 'Bank', iconId: 2 },
+    ];
 
   return {
     getAllTransaction: function () {

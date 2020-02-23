@@ -1,7 +1,6 @@
 'use strict';
-
 const { TransactionHelper } = require('./transaction.helper');
-const { transactionType } = require('./model');
+const { transactionType } = require('./constant');
 
 
 module.exports.TransactionInput = (function () {

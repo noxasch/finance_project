@@ -1,8 +1,10 @@
+'use strict';
+
 module.exports.transactionType = ['Expense', 'Income', 'Transfer'];
 
 module.exports.operationType = ['Withdrawal', 'Deposit'];
 
-// id refer to index - so fix index
+// id refer to index - so fix index - this is fixed
 module.exports.category = [
   { name: 'Accomodation', icon: '<i class="fas fa-bed"></i>', color: '' },
   { name: 'Automobile', icon: '<i class="fas fa-car-side"></i>', color: '' },
@@ -37,9 +39,23 @@ module.exports.category = [
   { name: 'Others', icon: '<i class="fas fa-money-bill-wave"></i>', color: '' },
 ];
 
-// for custom category and account if needed
+// for account
 module.exports.icons = [
-  ''
+  '<i class="fas fa-wallet"></i>',
+  '<i class="fas fa-piggy-bank"></i>',
+  '<i class="fas fa-landmark"></i>',
+  '<i class="fas fa-book"></i>',
+  '<i class="fas fa-donate"></i>',
+  '<i class="fas fa-money-bill"></i>',
+  '<i class="fas fa-money-bill-wave"></i>',
+  '<i class="fas fa-hand-holding-usd"></i>',
+  '<i class="fas fa-money-check-alt"></i>',
+  '<i class="fas fa-stamp"></i>',
+  '<i class="far fa-credit-card"></i>',
+  '<i class="fas fa-credit-card"></i>',
+  '<i class="fas fa-cash-register"></i>',
+  '<i class="fas fa-coins"></i>',
+  '<i class="fas fa-balance-scale"></i>',
 ];
 
 module.exports.colors = [

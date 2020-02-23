@@ -1,6 +1,7 @@
+'use strict';
 const { ipcRenderer } = require('electron');
 const { TransactionHelper } = require('./transaction.helper');
-const { transactionType } = require('./model');
+const { transactionType } = require('./constant');
 const { formValidated } = require('./form.validate.helper');
 
 window.addEventListener('hashchange', (e) => {

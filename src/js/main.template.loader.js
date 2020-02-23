@@ -1,3 +1,4 @@
+'use strict';
 const mainSection = document.getElementById('middle');
 const links = document.querySelectorAll('link[rel="import"]')
 

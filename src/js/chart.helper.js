@@ -1,3 +1,4 @@
+'use strict';
 const Chart = require('chart.js');
 
 Chart.defaults.global.elements.arc.borderColor = '#232429';

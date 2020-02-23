@@ -3,8 +3,6 @@
 module.exports.transactionType = ['expense', 'income', 'transfer'];
 module.exports.operationType = ['withdrawal', 'deposit'];
 
-console.log('Transaction Model');
-
 const transactionModel = (function () {
   const state = {
     totalBalance: 0,

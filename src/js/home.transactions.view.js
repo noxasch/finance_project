@@ -70,7 +70,7 @@ const UIController = (function () {
           rows += `<tr class="row" id="${idLabel[parentName]}-${item.id}">
             <td class="table-cell">
               ${item.label}
-              <span class="text--secondary">(${account[item.accountId]})</span>
+              <span class="text--secondary">(${account[item.accountId].name})</span>
             </td>
             <td class="table-cell">${date}</td>
             <td class="table-cell ${priceColor}"> ${currencySymbol} ${TransactionHelper.toLocaleFixed(parseFloat(item.amount))}
@@ -105,7 +105,7 @@ const UIController = (function () {
       console.log(row.children[0].childNodes[0].textContent);
       console.log(row.children[0].children[0].innerText);
       row.children[0].childNodes[0].textContent = `${item.label} `;
-      row.children[0].childNodes[1].textContent = `(${account[item.accountId]})`;
+      row.children[0].childNodes[1].textContent = `(${account[item.accountId].name})`;
       row.children[1].childNodes[0].textContent = `${TransactionHelper.convertDate(item.datetime)}`;
     },
 
