@@ -1,0 +1,33 @@
+{
+  "name": "finance_project",
+  "version": "0.1.0",
+  "description": "",
+  "main": "src/js/main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noxasch/finance_project.git"
+  },
+  "author": "Alexander Dischberg",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/noxasch/finance_project/issues"
+  },
+  "homepage": "https://github.com/noxasch/finance_project#readme",
+  "devDependencies": {
+    "electron": "^8.0.0",
+    "electron-packager": "^14.2.1",
+    "electron-rebuild": "^1.10.0",
+    "gulp": "^4.0.2",
+    "gulp-htmlmin": "^5.0.1",
+    "gulp-terser-js": "^5.1.2",
+    "jest": "^25.1.0"
+  },
+  "dependencies": {
+    "chart.js": "^2.9.3",
+    "sqlite3": "^4.1.1"
+  }
+}

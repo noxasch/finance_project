@@ -1,0 +1,35 @@
+<section id="home" class="main-content show">
+  <div class="grid__row">
+    <div class="card grid__col">
+      <div class="card__title">Total Balance</div>
+      <span class="card__currency">RM</span>&nbsp;<div class="card__amount">0</div>
+    </div>
+  </div>
+  <div class="grid__row grid__row-mid ">
+    <div class="grid__col-2-1 card card--block">
+      <canvas id="myline"></canvas>
+    </div>
+    <div class="grid__col-2-3 card card--block">
+      <canvas id="myChart"></canvas>
+    </div>
+  </div>
+  <div class="grid__row grid__row-mid card card--block">
+    <table class="table">
+      <thead class="table__head">
+        <tr class="table__row">
+          <th class="table__cell">item</th>
+          <th class="table__cell">date</th>
+          <th class="table__cell">amount</th>
+        </tr>
+      </thead>
+      <tbody class="table__body">
+      </tbody>
+    </table>
+    <div class="text--center text--secondary text--small text--underline">
+      <a href="#transactions">See All Transaction</a>
+    </div>
+  </div>
+  <script>
+    require('../js/home.view');
+  </script>
+</section>

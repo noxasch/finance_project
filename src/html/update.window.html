@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+  <title>Update Transaction</title>
+  <link rel="stylesheet" href="../css/main.min.css">
+</head>
+
+<body style="overflow-y: auto;">
+  <div class="grid-container__middle card card--block">
+    <div class="card__grid">
+      <form class="form-group" id="transaction-form">
+        <div class="input-group">
+          <label for="transaction-input" class="input-group-label">Transaction</label>
+          <select name="transaction-input" id="transaction-input" class="form-control">
+            <option value="0">Expense</option>
+            <option value="1">Income</option>
+            <option value="2">Transfer</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="account-input-from" class="input-group-label">Account (from)</label>
+          <select name="account-input-from" id="account-input-from" class="form-control">
+            <option value="0">Wallet</option>
+            <option value="1">Bank A</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="type" class="input-group-label">Account (to)</label>
+          <select name="account" id="account-input-to" class="form-control" disabled>
+            <option value="0">Wallet</option>
+            <option value="1">Bank A</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="type" class="input-group-label">Date</label>
+          <input type="date" name="date" id="date-input" class="form-control">
+        </div>
+        <div class="input-group">
+          <label for="type" class="input-group-label">Amount</label>
+          <input type="text" name="amount" id="amount-input" class="form-control">
+        </div>
+        <div class="input-group">
+          <label for="type" class="input-group-label">Payee / Item (optional)</label>
+          <input type="text" name="label" id="label-input" class="form-control">
+        </div>
+        <div class="input-group">
+          <label for="category-input" class="input-group-label">Category (optional)</label>
+          <input type="text" list="categories" name="category-input" id="category-input" class="form-control" />
+          <datalist id="categories">
+            <option>Shopping</option>
+            <option>Vacation</option>
+            <option>Utilities</option>
+            <option>Transport</option>
+          </datalist>
+        </div>
+        <div class="btn__group">
+          <button type="button" class="btn btn-grey btn--secondary" id="cancel">Cancel</button>
+          <button type="submit" class="btn">Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script>
+    require('../js/update.window.view');
+  </script>
+</body>
+
+</html>

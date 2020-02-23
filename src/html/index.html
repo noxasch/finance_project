@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+  <title>Finance App</title>
+  <link rel="stylesheet" href="../css/main.min.css">
+  <link rel="stylesheet" href="../css/all.min.css">
+  <link rel="stylesheet" href="../css/Chart.min.css">
+
+  <link rel="import" href="home.template.html">
+  <link rel="import" href="analytics.template.html">
+  <link rel="import" href="transactions.template.html">
+  <link rel="import" href="settings.template.html">
+</head>
+
+<body>
+  <div class="grid-container">
+    <!-- <section class="toolbar">
+    </section> -->
+    <section class="grid-container__left main-sidebar">
+      <div class="user-info">
+        <!-- <div class="user-info__image">
+        </div> -->
+        <div class="user-info__meta">
+          <span class="user-info__meta--name">Alexander Dischberg</span>
+          <span class="user-info__meta--account-type text--secondary text--small">Premium</span>
+        </div>
+      </div>
+      <nav class="menu">
+        <ul class="menu-box">
+          <li class="menu-box__item"><a href="#home" class="menu-box__link active"><i
+                class="fas fa-home"></i>&nbsp;&nbsp;Home</a></li>
+          <li class="menu-box__item"><a href="#analytics" class="menu-box__link"><i
+                class="fas fa-chart-bar"></i>&nbsp;&nbsp;Analytics</a></li>
+          <li class="menu-box__item"><a href="#transactions" class="menu-box__link"><i
+                class="fas fa-book"></i>&nbsp;&nbsp;Transaction</a></li>
+          <li class="menu-box__item"><a href="#settings" class="menu-box__link"><i
+                class="fas fa-sliders-h"></i>&nbsp;&nbsp;Settings</a></li>
+        </ul>
+      </nav>
+    </section>
+
+    <main class="grid-container__middle" id="middle">
+    </main>
+
+    <!-- Quick Action -->
+    <section class="grid-container__right ">
+      <form class="form-group" id="transaction-form">
+        <div class="input-group">
+          <label for="transaction-input" class="input-group-label">Transaction</label>
+          <!-- <input type="text" name="type" id="type" class="form-control"> -->
+          <select name="transaction-input" id="transaction-input" class="form-control" autofocus>
+            <option value="0" selected>Expense</option>
+            <option value="1">Income</option>
+            <option value="2">Transfer</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="account-input-from" class="input-group-label">Account (from)</label>
+          <!-- <input type="text" name="account" id="account" class="form-control"> -->
+          <select name="account-input-from" id="account-input-from" class="form-control">
+            <option value="0" selected>Wallet</option>
+            <option value="1">Bank A</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="account-input-too" class="input-group-label">Account (to)</label>
+          <!-- <input type="text" name="account" id="account" class="form-control"> -->
+          <select name="account-input-to" id="account-input-to" class="form-control">
+            <option value="0" selected>Wallet</option>
+            <option value="1">Bank A</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="date-input" class="input-group-label">Date</label>
+          <input type="date" name="date-input" id="date-input" class="form-control">
+        </div>
+        <div class="input-group">
+          <label for="amount-input" class="input-group-label">Amount</label>
+          <input type="text" name="amount" id="amount-input" class="form-control">
+        </div>
+        <div class="input-group">
+          <label for="label-input" class="input-group-label">Payee / Item / Remarks (optional)</label>
+          <input type="text" name="label" id="label-input" class="form-control">
+        </div>
+        <div class="input-group">
+          <label for="category-input" class="input-group-label">Category (optional)</label>
+          <input type="text" list="categories" name="category-input" id="category-input" class="form-control" />
+          <datalist id="categories">
+            <option>Shopping</option>
+            <option>Vacation</option>
+            <option>Utilities</option>
+            <option>Transport</option>
+          </datalist>
+        </div>
+        <button type="submit" class="btn btn-block">Add Transaction</button>
+      </form>
+    </section>
+    <div class="toggle__right-menu">
+      <input type="checkbox" id="right-toggle" class="toggle-checkbox">
+      <label for="right-toggle" class="toggle-button"><span class="toggle-icon">&nbsp;</span></label>
+    </div>
+  </div>
+  <script>
+    require('../js/index.view.js');
+    require('../js/main.template.loader');
+    require('../js/transaction.view');
+    require('../js/chart.helper');
+  </script>
+</body>
+
+</html>
