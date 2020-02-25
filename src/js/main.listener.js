@@ -12,7 +12,6 @@ function registerListener(db, mainWindow) {
       account: db.getAllAccount(),
       transactions: db.getAllTransaction()
     }
-    console.log(db.getAllTransaction());
     event.sender.send('transaction:init', data);
   });
 
@@ -28,13 +27,13 @@ function registerListener(db, mainWindow) {
 
   ipcMain.on('delete:item', (event, itemId) => {
     // console.log('delete', itemId);
-    db.deleteItem(itemId);
+    db.deleteTransaction(itemId);
     const data = {
       account: db.getAllAccount(),
       transactions: db.getAllTransaction(),
       // newTransaction: null
     };
-    console.log(db.getAllTransaction());
+    // console.log(db.getAllTransaction());
     event.sender.send('transaction:init', data);
   });
 
@@ -52,7 +51,7 @@ function registerListener(db, mainWindow) {
 
   ipcMain.on('form:update', (event, result) => {
     db.updateTransaction(result);
-    console.log(event);
+    // console.log(event);
     const data = {
       account: db.getAllAccount(),
       transactions: db.getAllTransaction(),

@@ -1,8 +1,8 @@
 'use strict';
 const { ipcRenderer } = require('electron');
-const { TransactionHelper } = require('./transaction.helper');
 const { transactionType } = require('./constant');
 const { formValidated } = require('./form.validate.helper');
+const { toLocaleFixed } = require('./timedate.helper');
 
 window.addEventListener('hashchange', (e) => {
   if (document.querySelector(`${window.location.hash}`) !== null) {
@@ -123,7 +123,7 @@ document.getElementById('amount-input').addEventListener('keyup', (e) => {
     // value = parseFloat(value);
     // console.log('Floated', value);
     // const num = toLocaleFixed(value);
-    const num = TransactionHelper.toLocaleFixed(parseFloat(e.target.value.replace(/\,/g, '')));
+    const num = toLocaleFixed(parseFloat(e.target.value.replace(/\,/g, '')));
     // console.log('Locale', num);
     const start = e.target.selectionStart;
     const end = e.target.selectionEnd;

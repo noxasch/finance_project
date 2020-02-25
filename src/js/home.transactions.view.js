@@ -2,7 +2,7 @@
 
 const { ipcRenderer } = require('electron');
 const { transactionModel } = require('./transaction.model');
-const { TransactionHelper } = require('./transaction.helper');
+const { toLocaleFixed, convertDate, compareDate } = require('./timedate.helper');
 
 
 const UIController = (function () {
@@ -30,7 +30,7 @@ const UIController = (function () {
       let remaining = Math.max((endTime - now) / duration, 0);
       // const value = Math.round(end - (remaining * range));
       const value = end - (remaining * range);
-      el.textContent = TransactionHelper.toLocaleFixed(value);
+      el.textContent = toLocaleFixed(value);
       if (value == end) {
         clearInterval(timer);
       }
@@ -60,20 +60,20 @@ const UIController = (function () {
       // console.log(transactions);
       if (transactions) {
         // transactions.reverse();
-        transactions.sort((a, b) => TransactionHelper.compareDate(a.datetime, b.datetime));
+        transactions.sort((a, b) => compareDate(a.datetime, b.datetime));
         transactions.forEach((item) => {
           let priceColor = 'text--green';
           if (item.operation === 0) {
             priceColor = 'text--red';
           }
-          let date = TransactionHelper.convertDate(item.datetime);
-          rows += `<tr class="row" id="${idLabel[parentName]}-${item.id}">
+          let date = convertDate(item.datetime);
+          rows += `<tr class="row" data-id="${item.id}">
             <td class="table-cell">
               ${item.label}
               <span class="text--secondary">(${account[item.accountId].name})</span>
             </td>
             <td class="table-cell">${date}</td>
-            <td class="table-cell ${priceColor}"> ${currencySymbol} ${TransactionHelper.toLocaleFixed(parseFloat(item.amount))}
+            <td class="table-cell ${priceColor}"> ${currencySymbol} ${toLocaleFixed(parseFloat(item.amount))}
               &nbsp;&nbsp;
               <span class="dropdown">
                 <i class="fas fa-ellipsis-v"></i>
@@ -106,7 +106,7 @@ const UIController = (function () {
       console.log(row.children[0].children[0].innerText);
       row.children[0].childNodes[0].textContent = `${item.label} `;
       row.children[0].childNodes[1].textContent = `(${account[item.accountId].name})`;
-      row.children[1].childNodes[0].textContent = `${TransactionHelper.convertDate(item.datetime)}`;
+      row.children[1].childNodes[0].textContent = `${convertDate(item.datetime)}`;
     },
 
     updateTotalBalance: function (balance) {
@@ -128,8 +128,8 @@ const dropdownHandler = function (e) {
   if (e.target.parentNode.classList.contains('dropdown')) {
     if (document.querySelector('.dropdown-menu.show') !== null && document.querySelector('.dropdown-menu.show') !== e.target.nextElementSibling)
       document.querySelector('.dropdown-menu.show').classList.remove('show');
-    let itemId = e.target.parentNode.parentNode.parentNode.id;
-    itemId = itemId.split('-');
+    let itemId = e.target.parentNode.parentNode.parentNode.dataset.id;
+    // itemId = itemId.split('-');
     transactionModel.setCurrentItem(itemId[itemId.length - 1]);
     e.target.nextElementSibling.classList.toggle('show');
   } else if (document.querySelector('.dropdown-menu.show') !== null) {

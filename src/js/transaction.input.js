@@ -1,5 +1,5 @@
 'use strict';
-const { TransactionHelper } = require('./transaction.helper');
+const { toLocaleFixed  } = require('./timedate.helper');
 const { transactionType } = require('./constant');
 
 
@@ -101,7 +101,7 @@ module.exports.TransactionInput = (function () {
     addAmountInputListener: function () {
       document.getElementById(UISelectors.amountInput).addEventListener('keyup', (e) => {
         if (/[\d\.]+/i.test(e.target.value)) {
-          const num = TransactionHelper.toLocaleFixed(parseFloat(e.target.value.replace(/\,/g, '')));
+          const num = toLocaleFixed(parseFloat(e.target.value.replace(/\,/g, '')));
           const start = e.target.selectionStart;
           const end = e.target.selectionEnd;
           e.target.value = num;

@@ -2,7 +2,8 @@
 
 const { ipcRenderer, remote } = require('electron');
 // const remote = require('electron').remote;
-const { TransactionHelper } = require('./transaction.helper');
+// const { TransactionHelper } = require('./timedate.helper');
+const { toLocaleFixed } = require('./timedate.helper');
 const { TransactionInput } = require('./transaction.input');
 const { formValidated } = require('./form.validate.helper');
 
@@ -40,7 +41,7 @@ const UIdialogController = (function () {
         // console.log(remote.getCurrentWindow());
         // remote.getCurrentWindow().setSize(null, 568, true);
       };
-      document.getElementById(UISelectors.amountInput).value = TransactionHelper.toLocaleFixed(parseFloat(itemData.amount.replace(/\,/g, '')));
+      document.getElementById(UISelectors.amountInput).value = toLocaleFixed(parseFloat(itemData.amount.replace(/\,/g, '')));
       document.getElementById(UISelectors.labelInput).value = itemData.label;
       document.getElementById(UISelectors.categoryInput).value = itemData.category;
       document.getElementById(UISelectors.dateInput).value = itemData.datetime;
