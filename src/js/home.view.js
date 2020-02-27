@@ -3,6 +3,15 @@ const { ipcRenderer } = require('electron');
 const { transactionType } = require('./constant');
 const { formValidated } = require('./form.validate.helper');
 const { toLocaleFixed } = require('./timedate.helper');
+const { category } = require('./constant');
+
+let accountStore = null;
+const UIselectors = {
+  accountFromSelect: 'account-input-from',
+  accountToSelect: 'account-input-to',
+  categorySelect: 'category-input',
+  form: 'transaction-form'
+}
 
 window.addEventListener('hashchange', (e) => {
   if (document.querySelector(`${window.location.hash}`) !== null) {
@@ -46,6 +55,70 @@ function hideLabel() {
 
 function showLabel() {
   document.getElementById('label-input').parentElement.classList.remove('hide');
+}
+
+
+function updateAccountFrom(data) {
+  const select = document.getElementById(UIselectors.accountFromSelect);
+  while (select.firstChild) select.removeChild(select.firstChild);
+  let fragment = document.createDocumentFragment();
+  data.forEach((item) => {
+    const opt = document.createElement('option');
+    opt.value = item.id;
+    opt.textContent = item.account_name;
+    fragment.appendChild(opt);
+    // <option value="1">Bank A</option>
+  });
+  select.appendChild(fragment);
+}
+
+function updateAccountTo(data) {
+  const select = document.getElementById(UIselectors.accountToSelect)
+  while (select.firstChild) select.removeChild(select.firstChild);
+  let fragment = document.createDocumentFragment();
+  data.forEach((item) => {
+    const opt = document.createElement('option');
+    opt.value = item.id;
+    opt.textContent = item.account_name;
+    fragment.appendChild(opt);
+    // <option value="1">Bank A</option>
+  });
+  select.appendChild(fragment);
+}
+
+function resetAccount(data) {
+  accountStore = data;
+  updateAccountFrom(data);
+  updateAccountTo(data);
+}
+
+function initCategory() {
+  const select = document.getElementById(UIselectors.categorySelect);
+  while (select.firstChild) select.removeChild(select.firstChild);
+  let fragment = document.createDocumentFragment();
+  let count = 0;
+  category.forEach((cat) => {
+    const opt = document.createElement('option');
+    opt.value = count;
+    opt.textContent = cat.name;
+    fragment.appendChild(opt);
+    count++;
+  });
+  count = null;
+  select.appendChild(fragment);
+}
+
+function formChangeListener() {
+  document.getElementById(UIselectors.form).addEventListener('change', (e) =>{
+    // console.log(e.target.id);
+    // console.log(e.target.id === UIselectors.accountFromSelect);
+    // console.log(typeof e.target.value);
+    if (e.target.id === UIselectors.accountFromSelect) {
+      updateAccountTo(accountStore.filter((acc) => acc.id !== parseInt(e.target.value)));
+    } else if (e.target.id === UIselectors.accountToSelect) {
+      updateAccountFrom(accountStore.filter((acc) => acc.id !== parseInt(e.target.value)));
+    }
+  });
 }
 
 (function setTodaysDate() {
@@ -95,6 +168,9 @@ function displayAmountError() {
   document.getElementById('amount-input').reportValidity();
 }
 
+initCategory();
+formChangeListener();
+
 transactionForm.addEventListener('submit', (e) => {
   e.preventDefault();
   const formData = new FormData(transactionForm);
@@ -135,3 +211,10 @@ document.getElementById('amount-input').addEventListener('keyup', (e) => {
     e.target.setCustomValidity('Amount can only be numbers');
   }
 });
+
+ipcRenderer.on('transaction:init', (_, data) => {
+  console.log('muahahgag');
+  console.log(data);
+  resetAccount(data.account);
+});
+//UIController.updateAccount(data.account);

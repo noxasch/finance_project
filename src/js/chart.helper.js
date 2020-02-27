@@ -47,7 +47,7 @@ const mypiechart = new Chart('myChart', {
             return data.labels.map((label, i) => {
               const meta = chart.getDatasetMeta(0);
               const style = meta.controller.getStyle(i);
-              console.log(`${label}:${i}`)
+              // console.log(`${label}:${i}`);
               return {
                 text: `${label}: RM ${data.datasets[0].data[i]}`,
                 fillStyle: style.backgroundColor,

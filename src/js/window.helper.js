@@ -1,14 +1,15 @@
 'use strict';
 const { BrowserWindow } = require('electron');
 
-const UpdateDialog = (function () {
+const WindowDialog = (function () {
 
-  let dialogWindow = null;
+  let updateDialog = null;
+  let accountDialog = null;
 
   const windowOptions = {
     show: false,
     width: 500,
-    height: 530,
+    height: 520,
     webPreferences: {
       defaultFontSize: 14,
       nodeIntegration: true
@@ -16,19 +17,33 @@ const UpdateDialog = (function () {
   }
 
   return {
-    createDialogWindow: function (parent, filePath) {
+    createUpdateDialog: function (parent, filePath) {
       windowOptions['parent'] = parent;
-      dialogWindow = new BrowserWindow(windowOptions);
-      dialogWindow.loadURL(filePath);
-      dialogWindow.on('ready-to-show', () => {
-        dialogWindow.show();
+      updateDialog = new BrowserWindow(windowOptions);
+      updateDialog.loadURL(filePath);
+      updateDialog.on('ready-to-show', () => {
+        updateDialog.show();
       })
-      dialogWindow.on('closed', () => {
-        dialogWindow = null;
+      updateDialog.on('closed', () => {
+        updateDialog = null;
       });
-      return dialogWindow;
+      return updateDialog;
+    },
+
+    createAccountDialog: function (parent, filePath) {
+      windowOptions['parent'] = parent;
+      windowOptions.height = 380;
+      accountDialog = new BrowserWindow(windowOptions);
+      accountDialog.loadURL(filePath);
+      accountDialog.on('ready-to-show', () => {
+        accountDialog.show();
+      })
+      accountDialog.on('closed', () => {
+        accountDialog = null;
+      });
+      return accountDialog;
     }
   }
 })();
 
-module.exports = { UpdateDialog };
+module.exports = { WindowDialog };

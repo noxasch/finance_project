@@ -36,6 +36,9 @@
                 class="fas fa-chart-bar"></i>&nbsp;&nbsp;Analytics</a></li>
           <li class="menu-box__item"><a href="#transactions" class="menu-box__link"><i
                 class="fas fa-book"></i>&nbsp;&nbsp;Transaction</a></li>
+          <li class="menu-box__item"><a href="javascript:void(0)" class="menu-box__link"><i
+                class="fas fa-archive"></i></i>&nbsp;&nbsp;Accounts</a><button title="Add Account" id="addaccount" type="button"
+              class="menu-box--shortcut">+</button></li>
           <li class="menu-box__item"><a href="#settings" class="menu-box__link"><i
                 class="fas fa-sliders-h"></i>&nbsp;&nbsp;Settings</a></li>
         </ul>
@@ -61,16 +64,14 @@
           <label for="account-input-from" class="input-group-label">Account (from)</label>
           <!-- <input type="text" name="account" id="account" class="form-control"> -->
           <select name="account-input-from" id="account-input-from" class="form-control">
-            <option value="0" selected>Wallet</option>
-            <option value="1">Bank A</option>
+
           </select>
         </div>
         <div class="input-group">
           <label for="account-input-too" class="input-group-label">Account (to)</label>
           <!-- <input type="text" name="account" id="account" class="form-control"> -->
           <select name="account-input-to" id="account-input-to" class="form-control">
-            <option value="0" selected>Wallet</option>
-            <option value="1">Bank A</option>
+
           </select>
         </div>
         <div class="input-group">
@@ -87,13 +88,9 @@
         </div>
         <div class="input-group">
           <label for="category-input" class="input-group-label">Category (optional)</label>
-          <input type="text" list="categories" name="category-input" id="category-input" class="form-control" />
-          <datalist id="categories">
-            <option>Shopping</option>
-            <option>Vacation</option>
-            <option>Utilities</option>
-            <option>Transport</option>
-          </datalist>
+          <select name="category-input" id="category-input" class="form-control">
+          </select>
+
         </div>
         <button type="submit" class="btn btn-block">Add Transaction</button>
       </form>

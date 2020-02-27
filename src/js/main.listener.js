@@ -1,10 +1,10 @@
 'use strict';
-
 const path = require('path');
 const { ipcMain } = require('electron');
-const { UpdateDialog } = require('./window.helper');
+const { WindowDialog } = require('./window.helper');
 
 let dialogWindow = null;
+let accountWindow = null;
 
 function registerListener(db, mainWindow) {
   ipcMain.on('webview:ready', (event) => {
@@ -23,7 +23,7 @@ function registerListener(db, mainWindow) {
       newTransaction: newTransaction
     };
     event.sender.send('transaction:new', data);
-  })
+  });
 
   ipcMain.on('delete:item', (event, itemId) => {
     // console.log('delete', itemId);
@@ -42,7 +42,7 @@ function registerListener(db, mainWindow) {
     // console.log(app.getAppPath());
     // console.log(path.resolve(__dirname));
     // console.log(path.resolve(__dirname, '..'));
-    dialogWindow = UpdateDialog.createDialogWindow(mainWindow, path.join('file://', path.resolve(__dirname, '..'), 'html', 'update.window.html'));
+    dialogWindow = WindowDialog.createUpdateDialog(mainWindow, path.join('file://', path.resolve(__dirname, '..'), 'html', 'update.window.html'));
     ipcMain.on('dialog:ready', (event) => {
       const itemData = db.getTransaction(itemId)[0];
       dialogWindow.send('data:init', itemData);
@@ -57,7 +57,31 @@ function registerListener(db, mainWindow) {
       transactions: db.getAllTransaction(),
     };
     mainWindow.send('transaction:init', data);
-  })
+  });
+
+  ipcMain.on('init:account', (event) => {
+    accountWindow = WindowDialog.createAccountDialog(mainWindow, path.join('file://', path.resolve(__dirname, '..'), 'html', 'account.window.html'));
+  });
+
+  ipcMain.on('add:account', (event, result) => {
+    console.log(result);
+    try {
+      let accountId = db.addAccount(result);
+      // console.log(accountId);
+      let account = db.getAccount(accountId);
+      mainWindow.send('data:update', account);
+    } catch (error) {
+      if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+        console.log('Error: Account with the same name already exist');
+      } else {
+        throw error; // unexpected error
+      }
+      // console.log(error)
+      // console.log('CODE:', error.code);
+      // console.log('message:', error.message);
+    }
+
+  });
 
 }
 

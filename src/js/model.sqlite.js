@@ -66,26 +66,27 @@ const ModelSQLite = (function () {
    * @param {object} obj 
    */
   function addAccount(obj) {
-    let sql = `INSERT INTO ${table.account} (account_name, icon_id) VALUES (@name, @iconId)`;
-    let info = db.prepare(sql).run([obj.name, obj.iconId]);
-    return info.lastInsertRowId;
+    let sql = `INSERT INTO ${table.account} (account_name, icon_id) VALUES (@name, @iconid)`;
+    let info = db.prepare(sql).run(obj);
+    return info.lastInsertRowid;
   }
 
   /**
    * return array of object or empty array
    */
   function getAllAccount() {
-    let rows = db.prepare(`SELECT * FROM ${table.account} WHERE purged <> 1`).all();
+    let rows = db.prepare(`SELECT * FROM ${table.account} WHERE purged IS NULL;`).all();
     return rows;
   }
 
   function getAccount(accountid) {
+    console.log(accountid);
     let sql = `SELECT * FROM ${table.account} WHERE id = ?`;
     return db.prepare(sql).get([accountid]);
   }
 
   function updateAccount(accountObj) {
-    let sql = `UPDATE ${table.account} SET account_name = @name, icon_id = @iconId) WHERE id = @id`;
+    let sql = `UPDATE ${table.account} SET account_name = @name, icon_id = @iconid) WHERE id = @id`;
     db.prepare(sql).run(accountObj);
   }
 
@@ -105,9 +106,8 @@ const ModelSQLite = (function () {
     return rows;
   }
 
-
   function getAllTransaction(limit = null) {
-    let sql = `SELECT * FROM ${table.transaction} WHERE purged <> 1`;
+    let sql = `SELECT * FROM ${table.transaction} WHERE purged IS NULL`;
     if (typeof limit === "number") sql += `LIMIT ${limit}`;
     let rows = db.prepare(sql).all();
     return rows;
@@ -117,14 +117,15 @@ const ModelSQLite = (function () {
   function addTransaction(obj) {
     let sql = `INSERT INTO ${table.transaction} 
                     (label, amount, account_id, transaction_type, 
-                      operation, category, transaction_date, date_added, date_updated
-                      transfer_id, device_hash)
+                      operation, category, transaction_date, date_added, date_updated, transfer_id, device_hash)
                     VALUES
                       (@label, '@amount', @accountId, @type,
                         @operation, @category, @datetime, @dateAdded, @dateUpdated
                         @transferId, @deviceHash)`.replace(/\s+/g, ' ');
     let info = db.prepare(sql).run(obj);
-    return info.lastInsertRowid
+    
+
+    return info.lastInsertRowid;
   }
 
   function addMultipleTransaction(objArray) {

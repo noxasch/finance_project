@@ -47,8 +47,11 @@ const Model = (function() {
     },
 
     addAccount: function (inputObj) {
-      ModelSQLite.addTransaction(inputObj);
-      return true;
+      return ModelSQLite.addAccount(inputObj);
+    },
+
+    getAccount: function(accountId) {
+      return ModelSQLite.getAccount(accountId);
     },
 
     getAllAccount: function () {

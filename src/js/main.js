@@ -14,6 +14,8 @@ function initMain() {
     show: false,
     width: 1000,
     height: 650,
+    minWidth: 1000,
+    minHeight: 650,
     title: app.name,
     opacity: 0.98,
     webPreferences: {

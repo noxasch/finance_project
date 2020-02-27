@@ -1,8 +1,6 @@
 'use strict';
 
 const { ipcRenderer, remote } = require('electron');
-// const remote = require('electron').remote;
-// const { TransactionHelper } = require('./timedate.helper');
 const { toLocaleFixed } = require('./timedate.helper');
 const { TransactionInput } = require('./transaction.input');
 const { formValidated } = require('./form.validate.helper');
@@ -53,7 +51,6 @@ const UIdialogController = (function () {
 
     addCancelButtonListener: function () {
       document.getElementById(UISelectors.cancelBtn).addEventListener('click', (e) => {
-        console.log('cancel');
         remote.getCurrentWindow().close();
       })
     }
