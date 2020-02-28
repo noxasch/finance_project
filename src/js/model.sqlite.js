@@ -20,7 +20,7 @@ const ModelSQLite = (function () {
     // datetime = // YYYY-MM-DD to unixtime
     let sql = `CREATE TABLE IF NOT EXISTS ${table.transaction} (
         id INTEGER,
-        userid default NULL,
+        userid DEFAULT NULL,
         label VARCHAR(30) NOT NULL,
         amount REAL NOT NULL,
         transaction_type INT NOT NULL,
@@ -32,7 +32,7 @@ const ModelSQLite = (function () {
         date_updated DEFAULT (strftime('%s','now')),
         transfer_id INT,
         device_hash,
-        purged,
+        purged BOOLEAN BOOLEAN DEFAULT FALSE,
         PRIMARY KEY (id)
         FOREIGN KEY (account_id) REFERENCES ${table.account}(id)
         )`.replace(/\s+/g, ' ');
@@ -44,7 +44,8 @@ const ModelSQLite = (function () {
         id INTEGER,
         account_name VARCHAR(30) NOT NULL UNIQUE,
         icon_id INT,
-        purged,
+        include_in_total BOOLEAN DEFAULT TRUE, 
+        purged BOOLEAN DEFAULT FALSE,
         PRIMARY KEY (id)
         )`.replace(/\s+/g, ' ');
     db.prepare(sql).run();
@@ -75,7 +76,7 @@ const ModelSQLite = (function () {
    * return array of object or empty array
    */
   function getAllAccount() {
-    let rows = db.prepare(`SELECT * FROM ${table.account} WHERE purged IS NULL;`).all();
+    let rows = db.prepare(`SELECT * FROM ${table.account} WHERE purged <> 1;`).all();
     return rows;
   }
 
@@ -107,7 +108,7 @@ const ModelSQLite = (function () {
   }
 
   function getAllTransaction(limit = null) {
-    let sql = `SELECT * FROM ${table.transaction} WHERE purged IS NULL`;
+    let sql = `SELECT *, (SELECT SUM(amount) FROM ${table.transaction} WHERE purged <> 1 FROM ${table.transaction} WHERE purged <> 1`;
     if (typeof limit === "number") sql += `LIMIT ${limit}`;
     let rows = db.prepare(sql).all();
     return rows;

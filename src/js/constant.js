@@ -1,6 +1,9 @@
 'use strict';
 
-module.exports.transactionType = ['Expense', 'Income', 'Transfer'];
+module.exports.transactionType = [
+  { icon: '<i class="fas fa-money-bill-wave"></i>', name: 'Expense' }, 
+  { icon: '<i class="fas fa-money-check-alt"></i>', name: 'Income' }, 
+  { icon: '<i class="fas fa-random"></i>', name: 'Transfer'}];
 
 module.exports.operationType = ['Withdrawal', 'Deposit'];
 
@@ -56,6 +59,26 @@ module.exports.icons = [
   '<i class="fas fa-cash-register"></i>',
   '<i class="fas fa-coins"></i>',
   '<i class="fas fa-balance-scale"></i>',
+  
+  '<i class="fab fa-cc-paypal"></i>',
+  '<i class="fab fa-cc-apple-pay"></i>',
+  '<i class="fab fa-cc-amazon-pay"></i>',
+  '<i class="fab fa-cc-jcb"></i>',
+  '<i class="fab fa-cc-visa"></i>',
+  '<i class="fab fa-cc-stripe"></i>',
+  '<i class="fab fa-cc-amex"></i>',
+  '<i class="fab fa-cc-diners-club"></i>',
+  '<i class="fab fa-alipay"></i>',
+  '<i class="fab fa-google-wallet"></i>',
+  '<i class="fab fa-btc"></i>',
+  '<i class="fab fa-cc-discover"></i>',
+  '<i class="fab fa-amazon-pay"></i>',
+  '<i class="fab fa-apple-pay"></i>',
+  '<i class="fab fa-paypal"></i>',
+  '<i class="fab fa-stripe"></i>',
+  '<i class="fab fa-ethereum"></i>',
+  '<i class="fab fa-stripe-s"></i>',
+  '<i class="fab fa-gratipay"></i>'
 ];
 
 module.exports.colors = [

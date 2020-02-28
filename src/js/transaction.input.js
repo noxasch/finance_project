@@ -71,7 +71,7 @@ module.exports.TransactionInput = (function () {
         let option = document.createElement('option');
         if (i === 0) option.selected = true;
         option.value = i;
-        option.innerText = transactionType[i];
+        option.innerText = transactionType[i].name;
         fragment.appendChild(option)
       }
       transactionOption.append(fragment);

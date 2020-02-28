@@ -30,31 +30,31 @@ const transactionForm = document.getElementById('transaction-form');
 const transactionOption = document.getElementById('transaction-input');
 
 function hideAccountTo() {
-  document.getElementById('account-input-to').parentElement.classList.add('hide');
+  document.getElementById('account-input-to').parentElement.parentElement.classList.add('hide');
   document.getElementById('account-input-to').setAttribute('disabled', true);
 }
 
 function showAccountTo() {
-  document.getElementById('account-input-to').parentElement.classList.remove('hide');
+  document.getElementById('account-input-to').parentElement.parentElement.classList.remove('hide');
   document.getElementById('account-input-to').removeAttribute('disabled');
 }
 
 function hideAccountFrom() {
-  document.getElementById('account-input-from').parentElement.classList.add('hide');
+  document.getElementById('account-input-from').parentElement.parentElement.classList.add('hide');
   document.getElementById('account-input-from').setAttribute('disabled', true);
 }
 
 function showAccountFrom() {
-  document.getElementById('account-input-from').parentElement.classList.remove('hide');
+  document.getElementById('account-input-from').parentElement.parentElement.classList.remove('hide');
   document.getElementById('account-input-from').removeAttribute('disabled');
 }
 
 function hideLabel() {
-  document.getElementById('label-input').parentElement.classList.add('hide');
+  document.getElementById('label-input').parentElement.parentElement.classList.add('hide');
 }
 
 function showLabel() {
-  document.getElementById('label-input').parentElement.classList.remove('hide');
+  document.getElementById('label-input').parentElement.parentElement.classList.remove('hide');
 }
 
 
@@ -138,7 +138,7 @@ function formChangeListener() {
     let option = document.createElement('option');
     if (i === 0) option.selected = true;
     option.value = i;
-    option.innerText = transactionType[i];
+    option.innerText = transactionType[i].name;
     fragment.appendChild(option)
   }
   transactionOption.append(fragment);
@@ -169,7 +169,7 @@ function displayAmountError() {
 }
 
 initCategory();
-formChangeListener();
+// formChangeListener(); // opt to check during validation instead
 
 transactionForm.addEventListener('submit', (e) => {
   e.preventDefault();

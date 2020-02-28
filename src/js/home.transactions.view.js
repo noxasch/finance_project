@@ -123,6 +123,7 @@ const UIController = (function () {
   }
 })();
 
+// on submit - reset account choice
 
 const dropdownHandler = function (e) {
   if (e.target.parentNode.classList.contains('dropdown')) {
@@ -171,7 +172,8 @@ document.addEventListener('click', (e) => {
 ipcRenderer.send('webview:ready');
 
 ipcRenderer.on('transaction:init', (e, data) => {
-  // console.log('transaction init');
+  console.log('transaction init');
+  // console.log(data);
   UIController.clearTable();
   UIController.renderTransactions(data);
   UIController.updateTotalBalance(transactionModel.getTotalBalance(data.transactions));
@@ -187,3 +189,7 @@ ipcRenderer.on('transaction:balance', (e, data) => {
   // console.log('transaction balance');
   UIController.updateTotalBalance(transactionModel.getTotalBalance(data.transactions));
 });
+
+ipcRenderer.on('data:update', (e, data) => {
+  console.log(data);
+})
