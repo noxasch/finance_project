@@ -108,7 +108,7 @@ const ModelSQLite = (function () {
   }
 
   function getAllTransaction(limit = null) {
-    let sql = `SELECT *, (SELECT SUM(amount) FROM ${table.transaction} WHERE purged <> 1 FROM ${table.transaction} WHERE purged <> 1`;
+    let sql = `SELECT * ${table.transaction} WHERE purged <> 1`;
     if (typeof limit === "number") sql += `LIMIT ${limit}`;
     let rows = db.prepare(sql).all();
     return rows;
