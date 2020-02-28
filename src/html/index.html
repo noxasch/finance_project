@@ -53,26 +53,27 @@
       <form class="form-group" id="transaction-form">
         <div class="input-group">
           <label for="transaction-input" class="input-group-label">Transaction</label>
-          <!-- <input type="text" name="type" id="type" class="form-control"> -->
-          <select name="transaction-input" id="transaction-input" class="form-control" autofocus>
-            <option value="0" selected>Expense</option>
-            <option value="1">Income</option>
-            <option value="2">Transfer</option>
-          </select>
+          <div class="select__display">
+            <select name="transaction-input" id="transaction-input" class="form-control" autofocus>
+              <option value="0" selected>Expense</option>
+              <option value="1">Income</option>
+              <option value="2">Transfer</option>
+            </select>
+          </div>
         </div>
         <div class="input-group">
           <label for="account-input-from" class="input-group-label">Account (from)</label>
-          <!-- <input type="text" name="account" id="account" class="form-control"> -->
-          <select name="account-input-from" id="account-input-from" class="form-control">
-
-          </select>
+          <div class="select__display">
+            <select name="account-input-from" id="account-input-from" class="form-control">
+            </select>
+          </div>
         </div>
         <div class="input-group">
           <label for="account-input-too" class="input-group-label">Account (to)</label>
-          <!-- <input type="text" name="account" id="account" class="form-control"> -->
-          <select name="account-input-to" id="account-input-to" class="form-control">
-
-          </select>
+          <div class="select__display">
+            <select name="account-input-to" id="account-input-to" class="form-control">
+            </select>
+          </div>
         </div>
         <div class="input-group">
           <label for="date-input" class="input-group-label">Date</label>
@@ -88,9 +89,10 @@
         </div>
         <div class="input-group">
           <label for="category-input" class="input-group-label">Category (optional)</label>
-          <select name="category-input" id="category-input" class="form-control">
-          </select>
-
+          <div class="select__display">
+            <select name="category-input" id="category-input" class="form-control">
+            </select>
+          </div>
         </div>
         <button type="submit" class="btn btn-block">Add Transaction</button>
       </form>
