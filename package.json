@@ -25,7 +25,8 @@
     "gulp": "^4.0.2",
     "gulp-htmlmin": "^5.0.1",
     "gulp-terser-js": "^5.1.2",
-    "jest": "^25.1.0"
+    "jest": "^25.1.0",
+    "spectron": "^10.0.1"
   },
   "dependencies": {
     "better-sqlite3": "^5.4.3",
