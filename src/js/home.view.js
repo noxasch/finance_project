@@ -1,220 +1,208 @@
 'use strict';
+
 const { ipcRenderer } = require('electron');
-const { transactionType } = require('./constant');
-const { formValidated } = require('./form.validate.helper');
-const { toLocaleFixed } = require('./timedate.helper');
-const { category } = require('./constant');
+const { transactionModel } = require('./transaction.model');
+const { CountryISO } = require('./country.iso');
+const { toLocaleFixed, convertDate, compareDate } = require('./timedate.helper');
 
-let accountStore = null;
-const UIselectors = {
-  accountFromSelect: 'account-input-from',
-  accountToSelect: 'account-input-to',
-  categorySelect: 'category-input',
-  form: 'transaction-form'
-}
-
-window.addEventListener('hashchange', (e) => {
-  if (document.querySelector(`${window.location.hash}`) !== null) {
-    document.querySelector('section.show').classList.remove('show');
-    document.querySelector(`${window.location.hash}`).classList.add('show');
+const UIController = (function () {
+  const maxRow = 10;
+  let baseCurrency = null;
+  let currencySymbol = null;
+  const parentName = '.table__body';
+  const idLabel = {
+    '.table__body': 'home-row'
   }
 
-  document.querySelector('.menu-box__link.active').classList.remove('active');
-  document.querySelector(`.menu-box__link[href="${window.location.hash}"]`).classList.add('active');
-  // console.log(document.querySelector('.menu-box__link.active'));
-  // console.log(document.querySelector(`.menu-box__ink[href="${window.location.hash}"]`));
-});
+  const animateValue = function (selector, end, duration = 500) {
+    // console.log(end);
+    const el = document.querySelector(selector);
+    const start = parseFloat(el.textContent.replace(',', ''));
+    const range = end - start;
+    const minTimer = 50;
+    let stepTime = Math.abs(Math.floor(duration / range));
+    stepTime = Math.max(stepTime, minTimer);
+    const startTime = new Date().getTime();
+    const endTime = startTime + duration;
+    let timer;
 
-// TODO: refactor for main page - refer update-dialog
-const transactionForm = document.getElementById('transaction-form');
-const transactionOption = document.getElementById('transaction-input');
-
-function hideAccountTo() {
-  document.getElementById('account-input-to').parentElement.parentElement.classList.add('hide');
-  document.getElementById('account-input-to').setAttribute('disabled', true);
-}
-
-function showAccountTo() {
-  document.getElementById('account-input-to').parentElement.parentElement.classList.remove('hide');
-  document.getElementById('account-input-to').removeAttribute('disabled');
-}
-
-function hideAccountFrom() {
-  document.getElementById('account-input-from').parentElement.parentElement.classList.add('hide');
-  document.getElementById('account-input-from').setAttribute('disabled', true);
-}
-
-function showAccountFrom() {
-  document.getElementById('account-input-from').parentElement.parentElement.classList.remove('hide');
-  document.getElementById('account-input-from').removeAttribute('disabled');
-}
-
-function hideLabel() {
-  document.getElementById('label-input').parentElement.parentElement.classList.add('hide');
-}
-
-function showLabel() {
-  document.getElementById('label-input').parentElement.parentElement.classList.remove('hide');
-}
-
-
-function updateAccountFrom(data) {
-  const select = document.getElementById(UIselectors.accountFromSelect);
-  while (select.firstChild) select.removeChild(select.firstChild);
-  let fragment = document.createDocumentFragment();
-  data.forEach((item) => {
-    const opt = document.createElement('option');
-    opt.value = item.id;
-    opt.textContent = item.account_name;
-    fragment.appendChild(opt);
-    // <option value="1">Bank A</option>
-  });
-  select.appendChild(fragment);
-}
-
-function updateAccountTo(data) {
-  const select = document.getElementById(UIselectors.accountToSelect)
-  while (select.firstChild) select.removeChild(select.firstChild);
-  let fragment = document.createDocumentFragment();
-  data.forEach((item) => {
-    const opt = document.createElement('option');
-    opt.value = item.id;
-    opt.textContent = item.account_name;
-    fragment.appendChild(opt);
-    // <option value="1">Bank A</option>
-  });
-  select.appendChild(fragment);
-}
-
-function resetAccount(data) {
-  accountStore = data;
-  updateAccountFrom(data);
-  updateAccountTo(data);
-}
-
-function initCategory() {
-  const select = document.getElementById(UIselectors.categorySelect);
-  while (select.firstChild) select.removeChild(select.firstChild);
-  let fragment = document.createDocumentFragment();
-  let count = 0;
-  category.forEach((cat) => {
-    const opt = document.createElement('option');
-    opt.value = count;
-    opt.textContent = cat.name;
-    fragment.appendChild(opt);
-    count++;
-  });
-  count = null;
-  select.appendChild(fragment);
-}
-
-function formChangeListener() {
-  document.getElementById(UIselectors.form).addEventListener('change', (e) =>{
-    // console.log(e.target.id);
-    // console.log(e.target.id === UIselectors.accountFromSelect);
-    // console.log(typeof e.target.value);
-    if (e.target.id === UIselectors.accountFromSelect) {
-      updateAccountTo(accountStore.filter((acc) => acc.id !== parseInt(e.target.value)));
-    } else if (e.target.id === UIselectors.accountToSelect) {
-      updateAccountFrom(accountStore.filter((acc) => acc.id !== parseInt(e.target.value)));
+    function run() {
+      const now = new Date().getTime();
+      let remaining = Math.max((endTime - now) / duration, 0);
+      // const value = Math.round(end - (remaining * range));
+      const value = end - (remaining * range);
+      el.textContent = toLocaleFixed(value);
+      if (value == end) {
+        clearInterval(timer);
+      }
     }
-  });
-}
 
-(function setTodaysDate() {
-  // set to today's date
-  // let today = new Date().toLocaleDateString();
-  let today = Date.now() - (new Date()).getTimezoneOffset() * 60000;
-  // console.log(today);
-  let dateInput = document.getElementById("date-input");
-  dateInput.valueAsNumber = today;
+    timer = setInterval(run, stepTime);
+    run();
+  }
+
+  return {
+
+    setCurrencyInfo: function(info) {
+      baseCurrency = info.currency;
+      currencySymbol = info.symbol;
+    },
+
+    deleteRow: function (id) {
+      const rowId = `${idLabel[parentName]}-${id}`;
+      // document.getElementById(rowId).remove();
+      console.log(document.getElementById(rowId).children);
+    },
+
+    clearTable: function () {
+      const table = document.querySelector(parentName);
+      while (table.firstChild) table.removeChild(table.firstChild);
+    },
+
+    renderTransactions: function (data = null) {
+
+      const table = document.querySelector(parentName);
+      let rows = '';
+      const { account, transactions } = data;
+      // console.log(transactions);
+      if (transactions) {
+        // transactions.reverse();
+        transactions.sort((a, b) => compareDate(a.transaction_date, b.transaction_date));
+        transactions.forEach((item) => {
+          let priceColor = 'text--green';
+          if (item.operation === 0) {
+            priceColor = 'text--red';
+          }
+          let currentAccount = account.filter((acc) => acc.id === item.account_id);
+          console.log(item.transaction_date);
+          let date = convertDate(item.transaction_date);
+          rows += `<tr class="row" data-id="${item.id}">
+            <td class="table-cell">
+              ${item.label}
+              <span class="text--secondary">(${currentAccount[0].account_name})</span>
+            </td>
+            <td class="table-cell">${date}</td>
+            <td class="table-cell ${priceColor}"> ${currencySymbol} ${toLocaleFixed(parseFloat(item.amount))}
+              &nbsp;&nbsp;
+              <span class="dropdown">
+                <i class="fas fa-ellipsis-v"></i>
+                <div class="dropdown-menu dropdown-menu-right">
+                  <span class="dropdown__item edit">Edit</span>
+                  <span class="dropdown__item delete">Delete</span>
+                </div>
+              </span>
+            </td>
+          </tr>`;
+        });
+        table.insertAdjacentHTML('afterbegin', rows);
+        while (parseInt(table.childElementCount) > maxRow) table.removeChild(table.lastChild);
+      } else {
+        console.log('no data to be render');
+      }
+    },
+
+    updateTransaction: function (data) {
+      const { account, item } = data;
+      console.log(item);
+      console.log(`${idLabel[parentName]}-${item.id}`);
+      const row = document.getElementById(`${idLabel[parentName]}-${item.id}`);
+      console.log(row);
+      let currentAccount = account.filter((acc) => acc.id === item.account_id);
+      // console.log(row.childNodes);
+      console.log(row.children);
+      console.log(row.children[0].textContent);
+      console.log(row.children[0].childNodes[0].textContent);
+      console.log(row.children[0].children[0].innerText);
+      row.children[0].childNodes[0].textContent = `${item.label} `;
+      row.children[0].childNodes[1].textContent = `(${currentAccount.account_name})`;
+      row.children[1].childNodes[0].textContent = `${convertDate(item.transaction_date)}`;
+    },
+
+    updateTotalBalance: function (balance) {
+      animateValue('.card__amount', balance);
+      if (parseFloat(balance) < 0) {
+        document.querySelector('.card__amount').classList.add('text--red');
+        document.querySelector('.card__currency').classList.add('text--red');
+      }
+      else {
+        document.querySelector('.card__amount').classList.remove('text--red');
+        document.querySelector('.card__currency').classList.remove('text--red');
+      }
+    }
+  }
 })();
 
+// on submit - reset account choice
 
-(function resetTransactionOption() {
-  while (transactionOption.firstChild) transactionOption.removeChild(transactionOption.firstChild);
-  const fragment = document.createDocumentFragment();
-  for (let i = 0; i < transactionType.length; i++) {
-    let option = document.createElement('option');
-    if (i === 0) option.selected = true;
-    option.value = i;
-    option.innerText = transactionType[i].name;
-    fragment.appendChild(option)
+const dropdownHandler = function (e) {
+  if (e.target.parentNode.classList.contains('dropdown')) {
+    if (document.querySelector('.dropdown-menu.show') !== null && document.querySelector('.dropdown-menu.show') !== e.target.nextElementSibling)
+      document.querySelector('.dropdown-menu.show').classList.remove('show');
+    let itemId = e.target.parentNode.parentNode.parentNode.dataset.id;
+    // itemId = itemId.split('-');
+    transactionModel.setCurrentItem(itemId[itemId.length - 1]);
+    e.target.nextElementSibling.classList.toggle('show');
+  } else if (document.querySelector('.dropdown-menu.show') !== null) {
+    document.querySelector('.dropdown-menu.show').classList.remove('show');
   }
-  transactionOption.append(fragment);
-  hideAccountTo();
-})();
-
-transactionOption.addEventListener('change', (e) => {
-  if (e.target.value === '0') {
-    showAccountFrom();
-    hideAccountTo();
-    showLabel();
-  }
-  if (e.target.value === '1') {
-    showAccountTo();
-    hideAccountFrom();
-    showLabel();
-  }
-  if (e.target.value === '2') {
-    showAccountFrom();
-    showAccountTo();
-    hideLabel();
-  }
-});
-
-function displayAmountError() {
-  document.getElementById('amount-input').setCustomValidity('invalid input');
-  document.getElementById('amount-input').reportValidity();
 }
 
-initCategory();
-// formChangeListener(); // opt to check during validation instead
-
-transactionForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const formData = new FormData(transactionForm);
-  // console.log(formData);
-  const results = {}
-  for (let [key, value] of formData.entries()) {
-    console.log(`${key}:${value}`);
-    if (key === 'amount') results[key] = value.replace(/\,/g, '');
-    else results[key] = value;
+const editItemHandler = function (e) {
+  if (e.target.parentNode.classList.contains('dropdown-menu')) {
+    if (e.target.classList.contains('edit')) {
+      const itemId = transactionModel.getCurrentItem();
+      console.log('edit', itemId);
+      ipcRenderer.send('update:item', itemId);
+    }
   }
+}
 
-  if (formValidated(results)) {
-    ipcRenderer.send('form:submit', results);
-    document.getElementById('right-toggle').checked = false;
-    document.querySelector('.grid-container__right').classList.remove('show');;
-  } else {
-    displayAmountError();
+const deleteItemHandler = function (e) {
+  if (e.target.parentNode.classList.contains('dropdown-menu')) {
+    if (e.target.classList.contains('delete')) {
+      // handle deletion
+      // remove from display
+      const itemId = transactionModel.getCurrentItem();
+      console.log('deleting', itemId);
+      // UIController.deleteRow(itemId);
+      // transactionModel.deleteCurrentItem();
+      // remove from db - delete when db confirm deletion
+      ipcRenderer.send('delete:item', itemId);
+    }
   }
+}
+
+document.addEventListener('click', (e) => {
+  dropdownHandler(e);
+  editItemHandler(e);
+  deleteItemHandler(e);
 });
 
-document.getElementById('amount-input').addEventListener('keyup', (e) => {
-  if (/[\d\.]+/i.test(e.target.value)) {
-    // console.log('\ninput', e.target.value);
-    // let value = e.target.value.replace(/\,/g, '');
-    // console.log('Clean', value);
-    // value = parseFloat(value);
-    // console.log('Floated', value);
-    // const num = toLocaleFixed(value);
-    const num = toLocaleFixed(parseFloat(e.target.value.replace(/\,/g, '')));
-    // console.log('Locale', num);
-    const start = e.target.selectionStart;
-    const end = e.target.selectionEnd;
-    e.target.value = num;
-    e.target.setSelectionRange(start, end);
-    e.target.setCustomValidity('');
-  }
-  else if (/[A-Za-z]/i.test(e.target.value)) {
-    e.target.setCustomValidity('Amount can only be numbers');
-  }
-});
+ipcRenderer.send('home:ready');
 
-ipcRenderer.on('transaction:init', (_, data) => {
-  console.log('muahahgag');
+ipcRenderer.on('home:init', (_, data) => {
   console.log(data);
-  resetAccount(data.account);
+  UIController.setCurrencyInfo(data.baseCurrency);
+  UIController.updateTotalBalance(data.balance);
+  UIController.renderTransactions(data);
+})
+
+ipcRenderer.on('transaction:init', (e, data) => {
+  console.log('transaction init');
+  // console.log(data);
+  UIController.clearTable();
+  UIController.renderTransactions(data);
+  console.log(data.transactions);
+  UIController.updateTotalBalance(transactionModel.getTotalBalance(data.transactions));
 });
-//UIController.updateAccount(data.account);
+
+ipcRenderer.on('home:new:transaction', (e, data) => {
+  // console.log('transaction new');
+  UIController.updateTotalBalance(transactionModel.getTotalBalance(data.transactions));
+  UIController.renderTransactions({ account: data.account, transactions: data.newTransaction });
+});
+
+ipcRenderer.on('transaction:balance', (e, data) => {
+  // console.log('transaction balance');
+  UIController.updateTotalBalance(transactionModel.getTotalBalance(data.transactions));
+});

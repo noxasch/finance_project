@@ -4,6 +4,20 @@ const toggle = document.getElementById('right-toggle');
 const rightMenu = document.querySelector('.grid-container__right');
 const btn_account = document.getElementById('addaccount');
 
+// nav
+window.addEventListener('hashchange', (e) => {
+  if (document.querySelector(`${window.location.hash}`) !== null) {
+    document.querySelector('section.show').classList.remove('show');
+    document.querySelector(`${window.location.hash}`).classList.add('show');
+  }
+
+  document.querySelector('.menu-box__link.active').classList.remove('active');
+  document.querySelector(`.menu-box__link[href="${window.location.hash}"]`).classList.add('active');
+  // console.log(document.querySelector('.menu-box__link.active'));
+  // console.log(document.querySelector(`.menu-box__ink[href="${window.location.hash}"]`));
+});
+
+// toggle quickMenu
 toggle.addEventListener('change', function () {
   if (toggle.checked) {
     rightMenu.classList.add('show');
@@ -12,6 +26,7 @@ toggle.addEventListener('change', function () {
   }
 });
 
+// add account
 btn_account.addEventListener('click', (e) => {
   ipcRenderer.send('init:account');
 });
