@@ -1,25 +1,50 @@
 'use strict';
 const { ipcRenderer, remote } = require('electron');
-const { icons } = require('./constant')
+const app = require('electron').remote.app;
+const { icons } = require('./constant');
+const { CountryISO } = require('./country.iso');
 
 const UI = (function() {
   const UIselectors = {
     iconBox: '.select__radio--box',
     form: 'account-form',
-    cancelBtn: 'cancel'
+    cancelBtn: 'cancel',
+    name: 'name',
+    currency: 'currency'
+  }
+
+  function initCurrencyOption() {
+    const select = document.getElementById(UIselectors.currency);
+    const local = app.getLocaleCountryCode();
+    const data = CountryISO.getList();
+    const fragment = document.createDocumentFragment();
+    data.forEach((item) => {
+      const opt = document.createElement('option');
+      opt.dataset.id = item.id;
+      opt.value = item.currency;
+      opt.textContent = item.currency;
+      if (item.ISO_2 === local) opt.selected = true;
+      fragment.appendChild(opt);
+    });
+    select.appendChild(fragment);
+  }
+
+  function initIcons() {
+    let html = '';
+    let count = 0;
+    icons.forEach((icon) => {
+      html += `<input type="radio" name="iconid" id="icon-${count}" value="${count}" ${(count === 0) ? 'checked' : ''} autofocus>
+            <label for="icon-${count}" tabindex="0"  class="select__radio--box-item">${icon}</label>`
+        .replace(/\s+/g, ' ');
+      count++;
+    });
+    document.querySelector(UIselectors.iconBox).insertAdjacentHTML('beforeend', html);
   }
 
   return {
     init: function() {
-      let html = '';
-      let count = 0;
-      icons.forEach((icon) => {
-        html += `<input type="radio" name="iconid" id="icon-${count}" value="${count}" ${(count === 0) ? 'checked' : ''} autofocus>
-            <label for="icon-${count}" tabindex="0"  class="select__radio--box-item">${icon}</label>`
-          .replace(/\s+/g, ' ');
-        count++;
-      });
-      document.querySelector(UIselectors.iconBox).insertAdjacentHTML('beforeend', html);
+      initIcons();
+      initCurrencyOption();
     },
 
     addCancelButtonListener: function () {
@@ -49,4 +74,7 @@ const UI = (function() {
 UI.init();
 UI.addCancelButtonListener();
 UI.addFormListener();
+let code = app.getLocaleCountryCode();
+console.log('Country Code', code);
+console.log(process.type);
 

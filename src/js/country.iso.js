@@ -1,6 +1,7 @@
 'use strict';
-const { app } = require('electron');
-
+// const { app } = require('electron'); // to use in main process
+const app = require('electron').remote.app; // to use in renderer
+// TODO: add flag for display
 module.exports.CountryISO = (function() {
   const countryinfo = [
     { id: 1, ISO_2: 'MY', ISO_3: 'MYS', currency: 'MYR', symbol: 'RM' },
@@ -36,3 +37,4 @@ module.exports.CountryISO = (function() {
     }
   }
 })();
+

@@ -20,7 +20,28 @@
         </div>
         <div class="input-group">
           <label for="name" class="input-group-label">Name</label>
-          <input type="text" name="name" id="name" class="form-control" required autofocus>
+          <input type="text" name="name" id="name" class="form-control" autofocus autocapitalize="words">
+        </div>
+        <div class="input-group">
+          <label for="currency" class="input-group-label">Currency</label>
+          <div class="select__display">
+            <select name="currency" id="currency" class="form-control">
+            </select>
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="initial" class="input-group-label">Initial Balance</label>
+          <input type="text" name="initial" id="initial" class="form-control">
+        </div>
+        <div class="input-group">
+          <label for="description" class="input-group-label">Description (Optional)</label>
+          <input type="text" name="description" id="description" class="form-control" autofocus autocapitalize="words">
+        </div>
+        
+        <input type="checkbox" name="include" id="include" checked>
+        <label for="include">Include In Total Balance</label>
+        <div class="input-group">
+          <!-- Intentionally left empty but change to margin-bottom later -->
         </div>
         <div class="btn__group">
           <button type="button" class="btn btn-grey btn--secondary" id="cancel">Cancel</button>
