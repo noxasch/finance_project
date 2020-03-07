@@ -1,6 +1,6 @@
 'use strict';
 
-const transactionModel = (function () {
+const Transaction = (function () {
   const state = {
     totalBalance: 0,
     currentItem: null
@@ -42,4 +42,4 @@ const transactionModel = (function () {
   }
 })();
 
-module.exports.transactionModel = transactionModel;
+module.exports = Transaction;

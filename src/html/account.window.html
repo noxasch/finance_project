@@ -38,10 +38,11 @@
           <input type="text" name="description" id="description" class="form-control" autofocus autocapitalize="words">
         </div>
         
-        <input type="checkbox" name="include" id="include" checked>
+        <input type="checkbox" name="include" id="include" value="1" checked>
+        <input class="hidden" type="checkbox" name="include" id="not-include" value="0" hidden>
         <label for="include">Include In Total Balance</label>
         <div class="input-group">
-          <!-- Intentionally left empty but change to margin-bottom later -->
+          <!-- Intentionally left empty but change to margin-bottom later on -->
         </div>
         <div class="btn__group">
           <button type="button" class="btn btn-grey btn--secondary" id="cancel">Cancel</button>

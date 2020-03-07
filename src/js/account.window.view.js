@@ -10,7 +10,10 @@ const UI = (function() {
     form: 'account-form',
     cancelBtn: 'cancel',
     name: 'name',
-    currency: 'currency'
+    currency: 'currency',
+    include: 'include',
+    notInclude: 'not-include',
+    initialBalance: 'initial'
   }
 
   function initCurrencyOption() {
@@ -41,26 +44,41 @@ const UI = (function() {
     document.querySelector(UIselectors.iconBox).insertAdjacentHTML('beforeend', html);
   }
 
+  function initBalance() {
+    document.getElementById(UIselectors.initialBalance).value = '0.00';
+  }
+
   return {
     init: function() {
       initIcons();
       initCurrencyOption();
+      initBalance();
     },
 
     addCancelButtonListener: function () {
       document.getElementById(UIselectors.cancelBtn).addEventListener('click', (e) => {
         remote.getCurrentWindow().close();
-      })
+      });
+    },
+
+    addCheckBoxListener: function() {
+      document.getElementById(UIselectors.include).addEventListener('change', (e) => {
+        if (e.target.checked === false) {
+          document.getElementById(UIselectors.notInclude).checked = true;
+        } else {
+          document.getElementById(UIselectors.notInclude).checked = false;
+        }
+      });
     },
 
     addFormListener: function() {
       document.getElementById(UIselectors.form).addEventListener('submit', (e) => {
         e.preventDefault();
-        const formData = new FormData(e.target);
-        const result = {};
+        let formData = new FormData(e.target);
+        let result = {};
         for (let [key, value] of formData.entries()) {
           console.log(`${key}:${value}`);
-          if (key === 'amount') result[key] = value.replace(/\,/g, '');
+          if (key === 'initial') result[key] = value.replace(/\,/g, '');
           else result[key] = value;
         }
         console.log(result);
@@ -73,8 +91,9 @@ const UI = (function() {
 
 UI.init();
 UI.addCancelButtonListener();
+UI.addCheckBoxListener();
 UI.addFormListener();
-let code = app.getLocaleCountryCode();
-console.log('Country Code', code);
-console.log(process.type);
+// let code = app.getLocaleCountryCode();
+// console.log('Country Code', code);
+// console.log(process.type);
 
