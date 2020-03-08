@@ -28,9 +28,10 @@ toggle.addEventListener('change', function () {
 
 // add account
 btn_account.addEventListener('click', (e) => {
-  ipcRenderer.send('init:account');
+  ipcRenderer.send('window:account');
 });
 
-ipcRenderer.on('data:update', (_, result) => {
+// update data
+ipcRenderer.on('index:update', (_, result) => {
   console.log(result);
 });
