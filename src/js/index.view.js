@@ -10,11 +10,11 @@ window.addEventListener('hashchange', (e) => {
     document.querySelector('section.show').classList.remove('show');
     document.querySelector(`${window.location.hash}`).classList.add('show');
   }
-
   document.querySelector('.menu-box__link.active').classList.remove('active');
   document.querySelector(`.menu-box__link[href="${window.location.hash}"]`).classList.add('active');
-  // console.trace(document.querySelector('.menu-box__link.active'));
-  // console.trace(document.querySelector(`.menu-box__ink[href="${window.location.hash}"]`));
+  // console.log(document.querySelector('.menu-box__link.active'));
+  // console.log(document.querySelector(`.menu-box__ink[href="${window.location.hash}"]`));
+  document.getElementById('middle').scrollTo(0, 0);
 });
 
 // toggle quickMenu
@@ -33,5 +33,5 @@ btn_account.addEventListener('click', (e) => {
 
 // update data
 ipcRenderer.on('index:update', (_, result) => {
-  console.trace(result);
+  console.log(result);
 });
