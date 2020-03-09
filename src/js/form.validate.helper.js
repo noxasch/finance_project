@@ -1,7 +1,7 @@
 'use strict';
 
 function validateAmount(results) {
-  // console.trace(results);
+  // console.log(results);
 
   switch (results['transaction-type']) {
     case '0':
@@ -19,9 +19,10 @@ function validateAmount(results) {
       }
       break;
     case '2':
-      if (results['amount-from'] === '' || results.amount === '0' ||
-        results.amount === undefined || parseFloat(results.amount) === 0.00 ||
-        isNaN(parseFloat(results.amount))) {
+      console.log(results);
+      if (results['amount-from'] === '' || results['amount-from'] === '0' ||
+        results['amount-from'] === undefined || parseFloat(results['amount-from']) === 0.00 ||
+        isNaN(parseFloat(results['amount-from']))) {
         return false;
       }
       if (results['amount-to'] === '' || results['amount-to'] === '0' ||

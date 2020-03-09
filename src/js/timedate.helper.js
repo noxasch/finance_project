@@ -16,6 +16,12 @@ function toUnixTimeStamp(dateString) {
   return new Date(dateString).getTime() / 1000;
 }
 
+function fromUnixTimeStamp(unixtimestamp) {
+  const dateOpts = { year: "numeric", month: "short", day: "numeric" };
+  const date = Intl.DateTimeFormat(undefined, dateOpts).format(new Date(unixtimestamp * 1000).getTime());
+  return date;
+}
+
 /** @param {string} date - 2020-02-10 into 10 Feb 2020 */
 function convertDate(date) {
   const dateOpts = { year: "numeric", month: "short", day: "numeric" };
@@ -32,7 +38,7 @@ function convertDate(date) {
  * @param {string} b - transaction_date b
  */
 function compareDate(a, b) {
-  // console.trace(a, b);
+  console.log(a, b);
   // consider comverting to unixtimestamp in case of performance degradation
   if (new Date(a.replace(/-/g, '/')) > new Date(b.replace(/-/g, '/'))) return -1;
   if (new Date(a.replace(/-/g, '/')) < new Date(b.replace(/-/g, '/'))) return 1;
@@ -40,6 +46,7 @@ function compareDate(a, b) {
 }
 
 module.exports = { 
+  fromUnixTimeStamp,
   convertDate,
   compareDate,
   toUnixTimeStamp,

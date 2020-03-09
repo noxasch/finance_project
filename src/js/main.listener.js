@@ -19,18 +19,24 @@ function registerListener(db, config, mainWindow) {
   });
 
   ipcMain.on('transaction:add', (event, results) => {
-    console.trace('ADD TRANSACTION: ', results);
+    // console.log('ADD TRANSACTION: ', results);
     const newTransaction = db.addTransaction(results);
+    // const data = {
+    //   account: db.getAccount(),
+    //   transactions: db.getAllTransaction(10),
+    //   newTransaction: newTransaction
+    // };
     const data = {
-      account: db.getAccount(),
+      balance: db.getAccountBalance().total_balance,
       transactions: db.getAllTransaction(10),
-      newTransaction: newTransaction
-    };
-    mainWindow.send('transaction:new', data);
+      account: db.getAccount(),
+      // baseCurrency: config.getBaseCurrency()
+    }
+    mainWindow.send('home:transaction:update', data);
   });
 
   ipcMain.on('transaction:delete', (event, itemId) => {
-    // console.trace('delete', itemId);
+    // console.log('delete', itemId);
     db.deleteTransaction(itemId);
     const data = {
       account: db.getAllAccount(),
@@ -49,14 +55,14 @@ function registerListener(db, config, mainWindow) {
       account: db.getAllAccount(),
       transaction: db.getTransaction(transactionId),
     };
-    console.trace('UPDATE', data);
+    console.log('UPDATE', data);
     event.sender.send('data:init', data);
   });
 
   ipcMain.on('transaction:update', (event, result) => {
     db.updateTransaction(result);
     transactionId = null;
-    // console.trace(event);
+    // console.log(event);
     const data = {
       account: db.getAllAccount(),
       transactions: db.getAllTransaction(),
@@ -69,11 +75,11 @@ function registerListener(db, config, mainWindow) {
   });
 
   ipcMain.on('account:add', (_, result) => {
-    // console.trace(result);
+    // console.log(result);
     // db.addAccount(result);
     try {
       let accountId = db.addAccount(result);
-      // console.trace(accountId);
+      // console.log(accountId);
       let account = db.getAccount(accountId);
       mainWindow.send('account:init', db.getAccount());
       // mainWindow.send('index:update', account);

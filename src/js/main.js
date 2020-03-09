@@ -17,14 +17,14 @@ model.init(dbname);
 
 function initMain() {
   const windowOptions = {
-    // show: false,
+    show: false,
     width: 1000,
     height: 650,
     // height: 800,
     minWidth: 1000,
     minHeight: 650,
     title: app.name,
-    // opacity: 0.98,
+    opacity: 0.98,
     webPreferences: {
       defaultFontSize: 14,
       nodeIntegration: true
@@ -36,7 +36,7 @@ function initMain() {
     mainWindow.loadURL(path.join('file://', path.resolve(__dirname, '..'), 'html', 'index.html'));
     mainWindow.on('ready-to-show', () => {
       mainWindow.send('account:init', model.getAccount());
-      // mainWindow.show();
+      mainWindow.show();
       // send data here
       // mainWindow.webContents.openDevTools();
     });
@@ -63,7 +63,7 @@ function initMain() {
   app.on('activate', () => {
     if (mainWindow === null)
       createMainWindow();
-    // console.trace('app:activate');
+    // console.log('app:activate');
   });
 }
 
@@ -75,7 +75,7 @@ function initMain() {
 initMain();
 // const db = new Database('people.db');
 // const stmt = db.prepare('SELECT COUNT(*) FROM sqlite_master WHERE type=?');
-// console.trace(stmt.get('table'));
+// console.log(stmt.get('table'));
 
 process.on('uncaughtException', (err) => {
   console.error((new Date).toLocaleString(), 'Uncaught Exception:', err.message);

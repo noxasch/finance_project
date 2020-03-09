@@ -14,17 +14,17 @@ const UISelectors = {
 function initSubmitEvent() {
   const transactionForm = document.getElementById(UISelectors.form);
   transactionForm.addEventListener('submit', (e) => {
-    console.trace(e);
+    console.log(e);
     e.preventDefault();
     const formData = new FormData(transactionForm);
-    // console.trace(formData);
+    // console.log(formData);
     const results = {}
     for (let [key, value] of formData.entries()) {
-      console.trace(`${key}:${value}`);
+      console.log(`${key}:${value}`);
       if (key === 'amount') results[key] = value.replace(/\,/g, '');
       else results[key] = value;
     }
-    console.trace(results);
+    console.log(results);
     if (validateAmount(results)) {
       ipcRenderer.send('transaction:add', results);
       TransactionInputUI.resetForm();
@@ -43,8 +43,8 @@ function initMain() {
 }
 
 ipcRenderer.on('account:init', (_, data) => {
-  console.trace("YO");
-  console.trace('ACCOUNT:INIT', data);
+  // console.log("YO");
+  // console.log('ACCOUNT:INIT', data);
   TransactionInputUI.initForm(data);
 });
 

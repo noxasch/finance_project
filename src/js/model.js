@@ -7,39 +7,45 @@ const Model = (function() {
   let lastItemId = null; 
   let account = null; // temp storage
   let totalBalance = null;
+
+  function resetAccount(data) {
+    account = data;
+  }
   return {
     init: function(dbname) {
       ModelSQLite.init(dbname);
       ModelSQLite.createTableAccount();
       ModelSQLite.createTableTransaction();
+      resetAccount(ModelSQLite.getAccount());
     },
+
 
     addTransaction: function(inputObj) {
       let lastInsertRowid = null;
-      console.trace('INPUT OBJ: ', inputObj);
+      console.log('INPUT OBJ: ', inputObj);
       const processed = TransactionHelper.processInput(inputObj, lastItemId, account);
-      console.trace('PROCESSED:', processed);
-      // if (processed.length > 1) {
-      //   lastInsertRowId = ModelSQLite.addMultipleTransaction(processed);
-      //   // console.trace(lastInsertRowid);
-      //   return ModelSQLite.getTransactionsByTransferId(processed[0].transferId);
-      // }
-      // if (processed.length === 1) {
-      //   lastInsertRowid = ModelSQLite.addTransaction(processed[0]);
-      //   return ModelSQLite.getTransactionById(lastInsertRowid);
-      // }
+      console.log('PROCESSED:', processed);
+      if (processed.length > 1) {
+        lastInsertRowid = ModelSQLite.addMultipleTransaction(processed);
+        // console.log(lastInsertRowid);
+        return ModelSQLite.getTransactionsByTransferId(processed[0].transferId);
+      }
+      if (processed.length === 1) {
+        lastInsertRowId = ModelSQLite.addTransaction(processed[0]);
+        return ModelSQLite.getTransactionById(lastInsertRowid);
+      }
     },
 
     getAllTransaction: function(limit = null) {
       const results = ModelSQLite.getAllTransaction(limit);
       lastItemId = results.length;
-      // console.trace('model\n',results);
+      // console.log('model\n',results);
       return results
     },
 
     getTransaction: function(itemId) {
       let row = ModelSQLite.getTransactionById(itemId);
-      // console.trace(row);
+      // console.log(row);
       return row;
     },
 
@@ -73,12 +79,15 @@ const Model = (function() {
       return true;
     },
 
-    getAccountBalance: function(accountId) {
-      return ModelSQLite.getAccountBalance(accountId);
+    getAccountBalance: function(accountId = null) {
+      let res = ModelSQLite.getAccountBalance(accountId);
+      console.log(res);
+      return res;
     },
 
     getTotalBalance: function() {
       let res = ModelSQLite.getAccountBalance();
+      console.log(res);
       if (res !== undefined) return res.total_balance;
     }
   }

@@ -77,11 +77,11 @@ const UI = (function() {
         let formData = new FormData(e.target);
         let result = {};
         for (let [key, value] of formData.entries()) {
-          console.trace(`${key}:${value}`);
+          console.log(`${key}:${value}`);
           if (key === 'initial') result[key] = value.replace(/\,/g, '');
           else result[key] = value;
         }
-        console.trace(result);
+        console.log(result);
         ipcRenderer.send('account:add', result);
         remote.getCurrentWindow().close();
       });
@@ -94,6 +94,6 @@ UI.addCancelButtonListener();
 UI.addCheckBoxListener();
 UI.addFormListener();
 // let code = app.getLocaleCountryCode();
-// console.trace('Country Code', code);
-// console.trace(process.type);
+// console.log('Country Code', code);
+// console.log(process.type);
 

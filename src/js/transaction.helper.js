@@ -13,49 +13,50 @@ module.exports.TransactionHelper = (function() {
      */
     processInput: function(inputObj, lastItemId, account) {
       const result = [];
-      console.trace('PROCESSING:',inputObj);
+      console.log('PROCESSING:',inputObj);
       const item = {
         label: inputObj['label'],
-        type: parseInt(inputObj['transaction-type']),
-        categoryId: parseInt(inputObj['category']), // update category
+        transaction_type: parseInt(inputObj['transaction-type']),
+        category_id: parseInt(inputObj['category']), // update category
         transaction_date: inputObj['date'],
-        transferId: null,
+        transfer_id: null,
         // ex_rate: null
       }
 
       switch (inputObj['transaction-type']) {
         case '0':
-          console.trace('CASE 0');
-          item['accountId'] = parseInt(inputObj['account-from']);
-          item['amount'] = parseFloat(`-${inputObj['amount-from']}`);
+          console.log('CASE 0');
+          item['account_id'] = parseInt(inputObj['account-from']);
+          item['amount'] = parseFloat(`-${inputObj['amount-from'].replace(',', '')}`);
           item['operation'] = 0;
           result.push(item);
           break;
         case '1':
-          console.trace('CASE 1');
-          item['accountId'] = parseInt(inputObj['account-to']);
-          item['amount'] = parseFloat(inputObj['amount-to']);
+          console.log('CASE 1');
+          item['account_id'] = parseInt(inputObj['account-to']);
+          item['amount'] = parseFloat(inputObj['amount-to'].replace(',', ''));
           item['operation'] = 1;
           result.push(item);
           break;
         case '2':
-          console.trace('CASE 2');
-          item['accountId'] = parseInt(inputObj['account-from']);
-          item.amount = parseFloat(`-${inputObj['amount-from']}`);
+          console.log('CASE 2');
+          item['account_id'] = parseInt(inputObj['account-from']);
+          item.amount = parseFloat(`-${inputObj['amount-from'].replace(',', '')}`);
+          console.log(account);
           item.label = `Transfer from ${account[parseInt(inputObj['account-from'])].name}`;
           item['operation']= 0; // withdraw
           item.transferId = lastItemId + 1;
           result.push(item);
-          // console.trace(item);
+          // console.log(item);
           const itemTwo = JSON.parse(JSON.stringify(item));
-          itemTwo.amount = parseFloat(inputObj['amount-to']);
+          itemTwo.amount = parseFloat(inputObj['amount-to'].replace(',', ''));
           itemTwo['operation'] = 1;
-          itemTwo.accountId = parseInt(inputObj['account-to']);
+          itemTwo.account_id = parseInt(inputObj['account-to']);
           itemTwo.label = `Transfer to ${account[parseInt(inputObj['account-to'])].name}`;
           result.push(itemTwo);
           break;
       }
-      console.trace(result)
+      console.log(result)
       return result;
     },
 

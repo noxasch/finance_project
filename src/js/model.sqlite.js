@@ -6,8 +6,8 @@ const Database = require('better-sqlite3');
 // we also need the business model
 
 const ModelSQLite = (function () {
-  // let db = null;
-  let db = new Database(''); // for code intellisense
+  let db = null;
+  // let db = new Database(''); // for code intellisense
   const table = {
     transaction: 'transactions',
     account: 'account',
@@ -94,9 +94,9 @@ const ModelSQLite = (function () {
    * if accountid is null return empy array or array of object
    */
   function getAccount(accountid = null) {
-    // console.trace(accountid);
+    // console.log(accountid);
     if (accountid) {
-      // console.trace('JEM');
+      // console.log('JEM');
       let sql = `SELECT * FROM ${table.account} WHERE id = ?`;
       return db.prepare(sql).get([accountid]);
     }
@@ -121,7 +121,7 @@ const ModelSQLite = (function () {
       sql = `SELECT SUM(amount) + (SELECT amount FROM ${table.account} WHERE id = ?) as ${table.account}_balance FROM ${table.transaction} WHERE account_id = ?`;
       return db.prepare(sql).get([accountId, accountId]);
     }
-    sql = `SELECT SUM(${table.transaction}.amount) + (SELECT SUM(amount) FROM ${table.account} WHERE include_in_total = 1 AND purged <> 1) as total_balance FROM ${table.transaction} INNER JOIN  ${table.account} WHERE ${table.account}.include_in_total = 1`;
+    sql = `SELECT SUM(${table.transaction}.amount) + (SELECT SUM(initial_balance) FROM ${table.account} WHERE include_in_total = 1 AND purged <> 1) as total_balance FROM ${table.transaction} INNER JOIN  ${table.account} WHERE ${table.account}.include_in_total = 1 AND ${table.transaction}.account_id = ${table.account}.id`;
     return db.prepare(sql).get();
   }
 
@@ -134,7 +134,7 @@ const ModelSQLite = (function () {
   // }
 
   function getTransactionById(itemId) {
-    // console.trace(itemId);
+    // console.log(itemId);
     let sql = `SELECT * FROM ${table.transaction} WHERE id = ?`;
     return db.prepare(sql).all([itemId]);
   }
@@ -148,9 +148,9 @@ const ModelSQLite = (function () {
   function getAllTransaction(limit = null) {
     let sql = `SELECT * FROM ${table.transaction} WHERE purged <> 1`;
     if (typeof limit === "number") sql += ` LIMIT ${limit}`;
-    // console.trace(sql);
+    // console.log(sql);
     let rows = db.prepare(sql).all();
-    // console.trace(rows);
+    // console.log(rows);
     return rows;
   }
   
@@ -161,23 +161,23 @@ const ModelSQLite = (function () {
                       operation, category, transaction_date, transfer_id)
                     VALUES
                       (@label, @amount, @account_id, @transaction_type,
-                        @operation, @categoryId, strftime('%s', @transaction_date),
-                        @transferId)`.replace(/\s+/g, ' ');
-    // console.trace('ADD', obj);
+                        @operation, @category_id, strftime('%s', @transaction_date),
+                        @transfer_id)`.replace(/\s+/g, ' ');
+    // console.log('ADD', obj);
     let info = db.prepare(sql).run(obj);
+    console.log(info);
     return info.lastInsertRowid;
   }
 
   function addMultipleTransaction(objArray) {
     let sql = `INSERT INTO ${table.transaction} 
                     (label, amount, account_id, transaction_type, 
-                      operation, category, transaction_date, date_added, date_updated,
-                      transfer_id)
+                      operation, category, transaction_date, transfer_id)
                     VALUES
-                      (@label, '@amount', @accountId, @type,
-                        @operation, @categoryId, strftime('%s', @transaction_date),
-                        @transferId)`.replace(/\s+/g, ' ');
-    // console.trace(sql);
+                      (@label, @amount, @account_id, @transaction_type,
+                        @operation, @category_id, strftime('%s', @transaction_date),
+                        @transfer_id)`.replace(/\s+/g, ' ');
+    // console.log(sql);
     const stmt = db.prepare(sql);
     const multiple = db.transaction((items) => {
       for (const item of items) {

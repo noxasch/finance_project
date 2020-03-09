@@ -99,7 +99,7 @@ module.exports.TransactionInputUI = (function () {
     while (select.firstChild) select.removeChild(select.firstChild);
     let fragment = document.createDocumentFragment();
     data.forEach((item) => {
-      // console.trace(item);
+      // console.log(item);
       const opt = document.createElement('option');
       opt.value = item.id;
       opt.textContent = item.name;
@@ -114,7 +114,7 @@ module.exports.TransactionInputUI = (function () {
     while (select.firstChild) select.removeChild(select.firstChild);
     let fragment = document.createDocumentFragment();
     data.forEach((item) => {
-      // console.trace(item);
+      // console.log(item);
       const opt = document.createElement('option');
       opt.value = item.id;
       opt.textContent = item.name;
@@ -225,7 +225,7 @@ module.exports.TransactionInputUI = (function () {
   return {
 
     initForm: function(data) {
-      console.trace(data);
+      console.log(data);
       // accountStore = data;
       resetTransactionOption();
       setTodaysDate();

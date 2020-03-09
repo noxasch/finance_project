@@ -2,7 +2,7 @@
 const { ipcRenderer } = require('electron');
 const Transaction = require('./transaction');
 const { CountryISO } = require('./country.iso');
-const { toLocaleFixed, convertDate, compareDate } = require('./timedate.helper');
+const { toLocaleFixed, convertDate, compareDate, fromUnixTimeStamp } = require('./timedate.helper');
 
 const UIController = (function () {
   const maxRow = 10;
@@ -14,7 +14,7 @@ const UIController = (function () {
   }
 
   const animateValue = function (selector, end, duration = 500) {
-    // console.trace(end);
+    // console.log(end);
     const el = document.querySelector(selector);
     const start = parseFloat(el.textContent.replace(',', ''));
     const range = end - start;
@@ -44,7 +44,7 @@ const UIController = (function () {
 
     setCurrencyInfo: function(base) {
       let info = CountryISO.getCountryInfoByCurrency(base)
-      // console.trace(info);
+      // console.log(info);
       baseCurrency = info.currency;
       currencySymbol = info.symbol;
       // currencySymbol = info;
@@ -53,7 +53,7 @@ const UIController = (function () {
     deleteRow: function (id) {
       const rowId = `${idLabel[tableSelector]}-${id}`;
       // document.getElementById(rowId).remove();
-      console.trace(document.getElementById(rowId).children);
+      console.log(document.getElementById(rowId).children);
     },
 
     clearTable: function () {
@@ -66,27 +66,28 @@ const UIController = (function () {
       const table = document.querySelector(tableSelector);
       let rows = '';
       const { account, transactions } = data;
-      // console.trace(transactions);
+      // console.log(transactions);
       if (transactions) {
         // transactions.reverse();
-        transactions.sort((a, b) => compareDate(a.transaction_date, b.transaction_date));
+        transactions.sort((a, b) => compareDate(fromUnixTimeStamp(a.transaction_date), fromUnixTimeStamp(b.transaction_date)));
         transactions.forEach((item) => {
           let priceColor = 'text--green';
           if (item.operation === 0) {
             priceColor = 'text--red';
           }
           let currentAccount = account.filter((acc) => acc.id === item.account_id);
-          // console.trace(account);
-          // console.trace(item.transaction_date);
-          // console.trace(item);
-          // console.trace(currentAccount);
-          // console.trace(currentAccount[0]);
-          console.trace(currencySymbol);
-          let date = convertDate(item.transaction_date);
+          // console.log(account);
+          // console.log(item.transaction_date);
+          // console.log(item);
+          // console.log(currentAccount);
+          // console.log(currentAccount[0]);
+          // console.log(currencySymbol);
+          // console.log(item);
+          let date = fromUnixTimeStamp(item.transaction_date);
           rows += `<tr class="row" data-id="${item.id}">
             <td class="table-cell">
               ${item.label}
-              <span class="text--secondary">(${currentAccount[0].account_name})</span>
+              <span class="text--secondary">(${currentAccount[0].name})</span>
             </td>
             <td class="table-cell">${date}</td>
             <td class="table-cell ${priceColor}"> ${currencySymbol} ${toLocaleFixed(parseFloat(item.amount))}
@@ -104,22 +105,23 @@ const UIController = (function () {
         table.insertAdjacentHTML('afterbegin', rows);
         while (parseInt(table.childElementCount) > maxRow) table.removeChild(table.lastChild);
       } else {
-        console.trace('no data to render');
+        console.log('no data to render');
       }
     },
 
     updateTransaction: function (data) {
       const { account, item } = data;
-      // console.trace(item);
-      // console.trace(`${idLabel[parentName]}-${item.id}`);
+      // console.log(item);
+      // console.log(`${idLabel[parentName]}-${item.id}`);
       const row = document.getElementById(`${idLabel[parentName]}-${item.id}`);
-      // console.trace(row);
+      // console.log(row);
       let currentAccount = account.filter((acc) => acc.id === item.account_id);
-      // console.trace(row.childNodes);
-      // console.trace(row.children);
-      // console.trace(row.children[0].textContent);
-      // console.trace(row.children[0].childNodes[0].textContent);
-      // console.trace(row.children[0].children[0].innerText);
+      // console.log(currentAccount);
+      // console.log(row.childNodes);
+      // console.log(row.children);
+      // console.log(row.children[0].textContent);
+      // console.log(row.children[0].childNodes[0].textContent);
+      // console.log(row.children[0].children[0].innerText);
       row.children[0].childNodes[0].textContent = `${item.label} `;
       row.children[0].childNodes[1].textContent = `(${currentAccount.account_name})`;
       row.children[1].childNodes[0].textContent = `${convertDate(item.transaction_date)}`;
@@ -158,7 +160,7 @@ const editItemHandler = function (e) {
   if (e.target.parentNode.classList.contains('dropdown-menu')) {
     if (e.target.classList.contains('edit')) {
       const itemId = Transaction.getCurrentItem();
-      console.trace('edit', itemId);
+      console.log('edit', itemId);
       ipcRenderer.send('update:item', itemId);
     }
   }
@@ -170,7 +172,7 @@ const deleteItemHandler = function (e) {
       // handle deletion
       // remove from display
       const itemId = Transaction.getCurrentItem();
-      console.trace('deleting', itemId);
+      console.log('deleting', itemId);
       // UIController.deleteRow(itemId);
       // Transaction.deleteCurrentItem();
       // remove from db - delete when db confirm deletion
@@ -195,34 +197,41 @@ ipcRenderer.on('home:init', (_, data) => {
   UIController.renderTransactions(data);
 });
 
-ipcRenderer.on('home:balance', (_, data) => {
-  // update balance after deletion
+ipcRenderer.on('home:transaction:update', (_, data) => {
+  // first load and edit
+  UIController.clearTable();
+  UIController.updateTotalBalance(data.balance);
+  UIController.renderTransactions(data);
 });
 
-ipcRenderer.on('home:transaction', (_, data) => {
-  // new transaction
-});
+// ipcRenderer.on('home:balance', (_, data) => {
+//   // update balance after deletion
+// });
 
-ipcRenderer.on('home:chart', (_, data) => {
+// ipcRenderer.on('home:transaction', (_, data) => {
+//   // new transaction
+// });
 
-});
+// ipcRenderer.on('home:chart', (_, data) => {
+
+// });
 
 // ipcRenderer.on('transaction:init', (e, data) => {
-//   console.trace('transaction init');
-//   // console.trace(data);
+//   console.log('transaction init');
+//   // console.log(data);
 //   UIController.clearTable();
 //   UIController.renderTransactions(data);
-//   console.trace(data.transactions);
+//   console.log(data.transactions);
 //   UIController.updateTotalBalance(Transaction.getTotalBalance(data.transactions));
 // });
 
 // ipcRenderer.on('home:new:transaction', (e, data) => {
-//   // console.trace('transaction new');
+//   // console.log('transaction new');
 //   UIController.updateTotalBalance(Transaction.getTotalBalance(data.transactions));
 //   UIController.renderTransactions({ account: data.account, transactions: data.newTransaction });
 // });
 
 // ipcRenderer.on('transaction:balance', (e, data) => {
-//   // console.trace('transaction balance');
+//   // console.log('transaction balance');
 //   UIController.updateTotalBalance(Transaction.getTotalBalance(data.transactions));
 // });
