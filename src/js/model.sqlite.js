@@ -172,11 +172,11 @@ const ModelSQLite = (function () {
   function addMultipleTransaction(objArray) {
     let sql = `INSERT INTO ${table.transaction} 
                     (label, amount, account_id, transaction_type, 
-                      operation, category, transaction_date, transfer_id)
+                      operation, category, transaction_date, transfer_id, exchange_rate)
                     VALUES
                       (@label, @amount, @account_id, @transaction_type,
                         @operation, @category_id, strftime('%s', @transaction_date),
-                        @transfer_id)`.replace(/\s+/g, ' ');
+                        @transfer_id, @exchange_rate)`.replace(/\s+/g, ' ');
     // console.log(sql);
     const stmt = db.prepare(sql);
     const multiple = db.transaction((items) => {
@@ -215,10 +215,6 @@ const ModelSQLite = (function () {
                   BETWEEN strftime('%s', date('?')) AND strftime('%s', date('?'))`.replace(/\s+/g, ' ');
     return db.prepare(sql).all([dateOne, dateTwo]);
   }
-
-
-
-
 
   return {
     init: function(database){

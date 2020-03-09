@@ -20,7 +20,7 @@ module.exports.TransactionHelper = (function() {
         category_id: parseInt(inputObj['category']), // update category
         transaction_date: inputObj['date'],
         transfer_id: null,
-        // ex_rate: null
+        exchange_rate: null
       }
 
       switch (inputObj['transaction-type']) {
@@ -42,9 +42,12 @@ module.exports.TransactionHelper = (function() {
           console.log('CASE 2');
           item['account_id'] = parseInt(inputObj['account-from']);
           item.amount = parseFloat(`-${inputObj['amount-from'].replace(',', '')}`);
-          console.log(account);
-          item.label = `Transfer from ${account[parseInt(inputObj['account-from'])].name}`;
+          // console.log(account);
+          let currentAccount = account.filter((item) => item.id === parseInt(inputObj['account-from']))[0];
+          // console.log(currentAccount);
+          item.label = `Transfer from ${currentAccount.name}`;
           item['operation']= 0; // withdraw
+          item.exchange_rate = parseFloat(inputObj['exrate']);
           item.transferId = lastItemId + 1;
           result.push(item);
           // console.log(item);
@@ -52,7 +55,8 @@ module.exports.TransactionHelper = (function() {
           itemTwo.amount = parseFloat(inputObj['amount-to'].replace(',', ''));
           itemTwo['operation'] = 1;
           itemTwo.account_id = parseInt(inputObj['account-to']);
-          itemTwo.label = `Transfer to ${account[parseInt(inputObj['account-to'])].name}`;
+          currentAccount = account.filter((item) => item.id === parseInt(inputObj['account-from']))[0];
+          itemTwo.label = `Transfer to ${currentAccount.name}`;
           result.push(itemTwo);
           break;
       }

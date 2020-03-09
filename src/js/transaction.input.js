@@ -8,6 +8,7 @@ const { category } = require('./constant');
 module.exports.TransactionInputUI = (function () {
   let state = null;
   let accountStore = null;
+  let exchange_rate = null;
   const UISelectors = {
     transactionType: 'transaction-type',
     accountFrom: 'account-from',
@@ -18,7 +19,7 @@ module.exports.TransactionInputUI = (function () {
     date: 'date-input',
     categorySelect: 'category-input',
     form: 'transaction-form', // handled by specific view
-    cancelBtn: 'cancel', // this handled by update.window.js
+    cancelBtn: 'cancel', // this handled by update.window.js only
     ex_rate: 'exrate'
   }
 
@@ -35,6 +36,22 @@ module.exports.TransactionInputUI = (function () {
       e.target.setCustomValidity('Amount can only be numbers');
     }
   }
+
+
+  function calculateAmount() {
+    const amount = document.getElementById(UISelectors.amountFrom).value;
+    // set default exchange rate
+    // output = amount x exchange_rate
+    if (/[\d\.]+/i.test(amount) && !isNaN(exchange_rate)) {
+      // convert this to line into a function that is testable
+      let converted = (parseFloat(amount.replace(/\,/g, '')).toPrecision(5) * exchange_rate);
+      console.log(parseFloat(amount.replace(/\,/g, '')).toPrecision(5));
+      console.log(Number(exchange_rate));
+      console.log(converted);
+      document.getElementById(UISelectors.amountTo).value = toLocaleFixed(converted);
+    }
+  }
+
 
   function hideAccountTo() {
     document.getElementById(UISelectors.accountTo).parentElement.parentElement.classList.add('hide');
@@ -130,12 +147,6 @@ module.exports.TransactionInputUI = (function () {
     updateAccountTo(data);
   }
 
-
-  function calculateAmount() {
-    // set default exchange rate
-    // output = input x exchange_rate
-  }
-
   function setTodaysDate() {
     const today = Date.now() - (new Date()).getTimezoneOffset() * 60000;
     const dateInput = document.getElementById(UISelectors.date);
@@ -168,6 +179,23 @@ module.exports.TransactionInputUI = (function () {
     });
   }
 
+  function exchangeRateListener(e) {
+    if (e.target.id === UISelectors.ex_rate) {
+      console.log(e);
+      if (/[\d\.]+/i.test(e.target.value)) {
+        e.target.value = (e.target.value).toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 })
+        exchange_rate = parseFloat(e.target.value).toPrecision(5);
+        calculateAmount();    
+        e.target.setCustomValidity('');
+      }
+      else if (/[A-Za-z]/i.test(e.target.value)) {
+        e.target.setCustomValidity('Exhange rate can only be numbers');
+        document.getElementById(UISelectors.form).reportValidity();
+      }
+    }
+
+  }
+
   function initTransactionTypeListener() {
     document.getElementById(UISelectors.transactionType).addEventListener('change', (e) => {
       if (e.target.value === '0') {
@@ -176,6 +204,8 @@ module.exports.TransactionInputUI = (function () {
         showCategory();
         showLabel();
         hideExchangeRate();
+        document.getElementById(UISelectors.amountFrom).removeEventListener('change', calculateAmount);
+        document.getElementById(UISelectors.ex_rate).removeEventListener('change', exchangeRateListener);
       }
       if (e.target.value === '1') {
         showAccountTo();
@@ -183,6 +213,8 @@ module.exports.TransactionInputUI = (function () {
         showCategory();
         showLabel();
         hideExchangeRate();
+        document.getElementById(UISelectors.amountFrom).removeEventListener('change', calculateAmount);
+        document.getElementById(UISelectors.ex_rate).removeEventListener('change', exchangeRateListener);
       }
       if (e.target.value === '2') {
         showAccountFrom();
@@ -190,12 +222,17 @@ module.exports.TransactionInputUI = (function () {
         hideLabel();
         hideCategory();
         showExchangeRate();
+        calculateAmount();
+        document.getElementById(UISelectors.amountFrom).addEventListener('change', calculateAmount);
+        document.getElementById(UISelectors.ex_rate).addEventListener('change', exchangeRateListener);
       }
     });
   }
 
-  function resetExchangeRate() {
-    document.getElementById(UISelectors.ex_rate).value = '1.0000';
+  function resetExchangeRate(rate = '1.0000') {
+    console.log(rate);
+    exchange_rate = parseFloat(rate);
+    document.getElementById(UISelectors.ex_rate).value = rate;
   };
 
   function resetAmount() {
@@ -243,12 +280,12 @@ module.exports.TransactionInputUI = (function () {
 
     showAmountFromError: function() {
       document.getElementById(UISelectors.amountFrom).setCustomValidity('invalid input');
-      // document.getElementById(UISelectors.amountFrom).reportValidity();
+      document.getElementById(UISelectors.form).reportValidity();
     },
 
     showAmountToError: function () {
       document.getElementById(UISelectors.amountTo).setCustomValidity('invalid input');
-      // document.getElementById(UISelectors.amountTo).reportValidity();
+      document.getElementById(UISelectors.form).reportValidity();
     },
 
     resetForm: function() {
