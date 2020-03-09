@@ -31,7 +31,7 @@ const Model = (function() {
         return ModelSQLite.getTransactionsByTransferId(processed[0].transferId);
       }
       if (processed.length === 1) {
-        lastInsertRowId = ModelSQLite.addTransaction(processed[0]);
+        lastInsertRowid = ModelSQLite.addTransaction(processed[0]);
         return ModelSQLite.getTransactionById(lastInsertRowid);
       }
     },
