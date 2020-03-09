@@ -75,7 +75,8 @@ function registerListener(db, config, mainWindow) {
       let accountId = db.addAccount(result);
       // console.trace(accountId);
       let account = db.getAccount(accountId);
-      mainWindow.send('index:update', account);
+      mainWindow.send('account:init', db.getAccount());
+      // mainWindow.send('index:update', account);
     } catch (error) {
       if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
         console.error('Error: Account with the same name already exist');
@@ -83,7 +84,7 @@ function registerListener(db, config, mainWindow) {
         throw error; // unexpected error
       }
     }
-    mainWindow.send('account:init', db.getAccount());
+    // mainWindow.send('account:init', db.getAccount());
   });
 
 }

@@ -7,8 +7,7 @@ const Database = require('better-sqlite3');
 
 const ModelSQLite = (function () {
   // let db = null;
-  let db = new Database('');
-  const paginate = 100;
+  let db = new Database(''); // for code intellisense
   const table = {
     transaction: 'transactions',
     account: 'account',
@@ -17,10 +16,11 @@ const ModelSQLite = (function () {
   }
 
   function createTableTransaction() {
-    // datetime = // YYYY-MM-DD to unixtime
+    // transaction_date = YYYY-MM-DD to unixtime
+    // exchange_Rate - for transfer at time conversion only
     let sql = `CREATE TABLE IF NOT EXISTS ${table.transaction} (
         id INTEGER,
-        userid DEFAULT NULL,
+        user_id DEFAULT NULL,
         label VARCHAR(30) NOT NULL,
         amount REAL NOT NULL,
         transaction_type INT NOT NULL,
@@ -31,6 +31,7 @@ const ModelSQLite = (function () {
         date_added DEFAULT (strftime('%s','now')),
         date_updated DEFAULT (strftime('%s','now')),
         transfer_id INT,
+        exchange_rate REAL,
         device_hash,
         purged BOOLEAN BOOLEAN DEFAULT FALSE,
         PRIMARY KEY (id)
@@ -42,9 +43,14 @@ const ModelSQLite = (function () {
   function createTableAccount() {
     let sql = `CREATE TABLE IF NOT EXISTS ${table.account} (
         id INTEGER,
-        account_name VARCHAR(30) NOT NULL UNIQUE,
+        name VARCHAR(30) NOT NULL UNIQUE,
         icon_id INT,
         include_in_total BOOLEAN DEFAULT TRUE, 
+        initial_balance REAL DEFAULT 0,
+        currency VARCHAR(3) NOT NULL,
+        description VARCHAR(50),
+        date_added DEFAULT (strftime('%s','now')),
+        date_updated DEFAULT (strftime('%s','now')),
         purged BOOLEAN DEFAULT FALSE,
         PRIMARY KEY (id)
         )`.replace(/\s+/g, ' ');
@@ -67,7 +73,8 @@ const ModelSQLite = (function () {
    * @param {object} obj 
    */
   function addAccount(obj) {
-    let sql = `INSERT INTO ${table.account} (account_name, icon_id) VALUES (@name, @iconid)`;
+    let sql = `INSERT INTO ${table.account} (name, icon_id, include_in_total, initial_balance, currency, description) 
+      VALUES (@name, @iconid, @include, @initial, @currency, @description)`.replace(/\s+/g, ' ');
     let info = db.prepare(sql).run(obj);
     return info.lastInsertRowid;
   }
@@ -80,10 +87,22 @@ const ModelSQLite = (function () {
     return rows;
   }
 
-  function getAccount(accountid) {
-    console.log(accountid);
-    let sql = `SELECT * FROM ${table.account} WHERE id = ?`;
-    return db.prepare(sql).get([accountid]);
+  /**
+   * 
+   * @param {*} accountid 
+   * if accountid is not null return undefined or an object 
+   * if accountid is null return empy array or array of object
+   */
+  function getAccount(accountid = null) {
+    // console.trace(accountid);
+    if (accountid) {
+      // console.trace('JEM');
+      let sql = `SELECT * FROM ${table.account} WHERE id = ?`;
+      return db.prepare(sql).get([accountid]);
+    }
+    let stmt = db.prepare(`SELECT * FROM ${table.account} WHERE purged <> 1;`)
+    let rows = stmt.all();
+    return rows;
   }
 
   function updateAccount(accountObj) {
@@ -92,13 +111,32 @@ const ModelSQLite = (function () {
   }
 
   function purgeAccount(accountId) {
-    let sql = `UPDATE ${table.transaction} SET purged = 1 WHERE id = ?`
+    let sql = `UPDATE ${table.account} SET purged = 1 WHERE id = ?`
     db.prepare(sql).run([accountId]);
   }
 
+  function getAccountBalance(accountId = null) {
+    let sql = '';
+    if (accountId) {
+      sql = `SELECT SUM(amount) + (SELECT amount FROM ${table.account} WHERE id = ?) as ${table.account}_balance FROM ${table.transaction} WHERE account_id = ?`;
+      return db.prepare(sql).get([accountId, accountId]);
+    }
+    sql = `SELECT SUM(${table.transaction}.amount) + (SELECT SUM(amount) FROM ${table.account} WHERE include_in_total = 1 AND purged <> 1) as total_balance FROM ${table.transaction} INNER JOIN  ${table.account} WHERE ${table.account}.include_in_total = 1`;
+    return db.prepare(sql).get();
+  }
+
+  // function getTransactionSumByType() {
+  //   sql = `SELECT`
+  // }
+
+  // function getTransactionSumByTypeAndDate() {
+
+  // }
+
   function getTransactionById(itemId) {
+    // console.trace(itemId);
     let sql = `SELECT * FROM ${table.transaction} WHERE id = ?`;
-    return db.prepare(sql).get([itemId]);
+    return db.prepare(sql).all([itemId]);
   }
 
   function getTransactionsByTransferId(transferId) {
@@ -108,9 +146,11 @@ const ModelSQLite = (function () {
   }
 
   function getAllTransaction(limit = null) {
-    let sql = `SELECT * ${table.transaction} WHERE purged <> 1`;
-    if (typeof limit === "number") sql += `LIMIT ${limit}`;
+    let sql = `SELECT * FROM ${table.transaction} WHERE purged <> 1`;
+    if (typeof limit === "number") sql += ` LIMIT ${limit}`;
+    // console.trace(sql);
     let rows = db.prepare(sql).all();
+    // console.trace(rows);
     return rows;
   }
   
@@ -118,27 +158,26 @@ const ModelSQLite = (function () {
   function addTransaction(obj) {
     let sql = `INSERT INTO ${table.transaction} 
                     (label, amount, account_id, transaction_type, 
-                      operation, category, transaction_date, date_added, date_updated, transfer_id, device_hash)
+                      operation, category, transaction_date, transfer_id)
                     VALUES
-                      (@label, '@amount', @accountId, @type,
-                        @operation, @category, @datetime, @dateAdded, @dateUpdated
-                        @transferId, @deviceHash)`.replace(/\s+/g, ' ');
+                      (@label, @amount, @account_id, @transaction_type,
+                        @operation, @categoryId, strftime('%s', @transaction_date),
+                        @transferId)`.replace(/\s+/g, ' ');
+    // console.trace('ADD', obj);
     let info = db.prepare(sql).run(obj);
-    
-
     return info.lastInsertRowid;
   }
 
   function addMultipleTransaction(objArray) {
     let sql = `INSERT INTO ${table.transaction} 
                     (label, amount, account_id, transaction_type, 
-                      operation, category, transaction_date, date_added, date_updated
-                      transfer_id, device_hash)
+                      operation, category, transaction_date, date_added, date_updated,
+                      transfer_id)
                     VALUES
                       (@label, '@amount', @accountId, @type,
-                        @operation, @category, @datetime, @dateAdded, @dateUpdated
-                        @transferId, @deviceHash)`.replace(/\s+/g, ' ');
-    
+                        @operation, @categoryId, strftime('%s', @transaction_date),
+                        @transferId)`.replace(/\s+/g, ' ');
+    // console.trace(sql);
     const stmt = db.prepare(sql);
     const multiple = db.transaction((items) => {
       for (const item of items) {
@@ -149,14 +188,16 @@ const ModelSQLite = (function () {
     return true;
   }
 
+
+
   function updateTransaction(obj) {
     let sql = `UPDATE ${table.transaction} 
               SET 
                 amount = @amount,
                 operation = @operation,
-                transaction_type = @type,
+                transaction_type = @transaction_type,
                 label = @label,
-                transaction_date = @datetime,
+                transaction_date =  strftime('%s', @transaction_date),
                 category = @category,
                 date_updated = strftime('%s','now')
               WHERE id = @id`.replace(/\s+/g, ' ');
@@ -175,6 +216,10 @@ const ModelSQLite = (function () {
     return db.prepare(sql).all([dateOne, dateTwo]);
   }
 
+
+
+
+
   return {
     init: function(database){
       db = new Database(database);
@@ -186,6 +231,7 @@ const ModelSQLite = (function () {
     getAllAccount,
     getAccount,
     purgeAccount,
+    
     updateAccount,
     addTransaction,
     addMultipleTransaction,
@@ -195,7 +241,17 @@ const ModelSQLite = (function () {
     purgeTransaction,
     updateTransaction,
     getTransactionBetween,
+
+    // getTransactionSum,
+    getAccountBalance,
   }
 })();
 
 module.exports = { ModelSQLite }
+
+// get sum of each account
+// total balance = balance of all account in base currency + balance in other currency (converted as today's rate)
+// balance use today's rate (latest rate)
+// transaction in it's own account currency
+// for now analytics should based on it's respective account currency only
+// multi currency and multi timeline rate seems to be impossible
