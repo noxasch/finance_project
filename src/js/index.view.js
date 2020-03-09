@@ -13,8 +13,8 @@ window.addEventListener('hashchange', (e) => {
 
   document.querySelector('.menu-box__link.active').classList.remove('active');
   document.querySelector(`.menu-box__link[href="${window.location.hash}"]`).classList.add('active');
-  // console.log(document.querySelector('.menu-box__link.active'));
-  // console.log(document.querySelector(`.menu-box__ink[href="${window.location.hash}"]`));
+  // console.trace(document.querySelector('.menu-box__link.active'));
+  // console.trace(document.querySelector(`.menu-box__ink[href="${window.location.hash}"]`));
 });
 
 // toggle quickMenu
@@ -28,10 +28,10 @@ toggle.addEventListener('change', function () {
 
 // add account
 btn_account.addEventListener('click', (e) => {
-  ipcRenderer.send('window:account');
+  ipcRenderer.send('account:window');
 });
 
 // update data
 ipcRenderer.on('index:update', (_, result) => {
-  console.log(result);
+  console.trace(result);
 });

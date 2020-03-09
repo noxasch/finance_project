@@ -37,7 +37,7 @@
           <li class="menu-box__item"><a href="#transactions" class="menu-box__link"><i
                 class="fas fa-book"></i>&nbsp;&nbsp;Transaction</a></li>
           <li class="menu-box__item"><a href="javascript:void(0)" class="menu-box__link"><i
-                class="fas fa-archive"></i></i>&nbsp;&nbsp;Accounts</a><button title="Add Account" id="addaccount" type="button"
+                class="fas fa-landmark"></i>&nbsp;&nbsp;Accounts</a><button title="Add Account" id="addaccount" type="button"
               class="menu-box--shortcut">+</button></li>
           <li class="menu-box__item"><a href="#settings" class="menu-box__link"><i
                 class="fas fa-sliders-h"></i>&nbsp;&nbsp;Settings</a></li>
@@ -54,7 +54,7 @@
         <div class="input-group">
           <label for="transaction-input" class="input-group-label">Transaction</label>
           <div class="select__display">
-            <select name="transaction-input" id="transaction-input" class="form-control" autofocus>
+            <select name="transaction-type" id="transaction-type" class="form-control" autofocus>
               <option value="0" selected>Expense</option>
               <option value="1">Income</option>
               <option value="2">Transfer</option>
@@ -62,26 +62,34 @@
           </div>
         </div>
         <div class="input-group">
-          <label for="account-input-from" class="input-group-label">Account (from)</label>
+          <label for="account-from" class="input-group-label">Account (from)</label>
           <div class="select__display">
-            <select name="account-input-from" id="account-input-from" class="form-control">
+            <select name="account-from" id="account-from" class="form-control">
             </select>
           </div>
         </div>
         <div class="input-group">
-          <label for="account-input-too" class="input-group-label">Account (to)</label>
+          <label for="amount-input" class="input-group-label">Amount (from)</label>
+          <input type="text" name="amount-from" id="amount-from" class="form-control">
+        </div>
+        <div class="input-group hide">
+          <label for="exrate" class="input-group-label">Exchange Rate</label>
+          <input type="text" name="exrate" id="exrate" class="form-control">
+        </div>
+        <div class="input-group">
+          <label for="account-too" class="input-group-label">Account (to)</label>
           <div class="select__display">
-            <select name="account-input-to" id="account-input-to" class="form-control">
+            <select name="account-to" id="account-to" class="form-control">
             </select>
           </div>
+        </div>
+        <div class="input-group">
+          <label for="amount-input" class="input-group-label">Amount (To)</label>
+          <input type="text" name="amount-to" id="amount-to" class="form-control">
         </div>
         <div class="input-group">
           <label for="date-input" class="input-group-label">Date</label>
-          <input type="date" name="date-input" id="date-input" class="form-control">
-        </div>
-        <div class="input-group">
-          <label for="amount-input" class="input-group-label">Amount</label>
-          <input type="text" name="amount" id="amount-input" class="form-control">
+          <input type="date" name="date" id="date-input" class="form-control" required>
         </div>
         <div class="input-group">
           <label for="label-input" class="input-group-label">Payee / Item / Remarks (optional)</label>
@@ -90,7 +98,7 @@
         <div class="input-group">
           <label for="category-input" class="input-group-label">Category (optional)</label>
           <div class="select__display">
-            <select name="category-input" id="category-input" class="form-control">
+            <select name="category" id="category-input" class="form-control">
             </select>
           </div>
         </div>
@@ -105,8 +113,8 @@
   <script>
     require('../js/index.view.js');
     require('../js/main.template.loader');
-    require('../js/home.transactions.view');
     require('../js/chart.helper');
+    require('../js/index.input.view');
   </script>
 </body>
 

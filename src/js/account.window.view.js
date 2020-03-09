@@ -77,12 +77,12 @@ const UI = (function() {
         let formData = new FormData(e.target);
         let result = {};
         for (let [key, value] of formData.entries()) {
-          console.log(`${key}:${value}`);
+          console.trace(`${key}:${value}`);
           if (key === 'initial') result[key] = value.replace(/\,/g, '');
           else result[key] = value;
         }
-        console.log(result);
-        ipcRenderer.send('add:account', result);
+        console.trace(result);
+        ipcRenderer.send('account:add', result);
         remote.getCurrentWindow().close();
       });
     }
@@ -94,6 +94,6 @@ UI.addCancelButtonListener();
 UI.addCheckBoxListener();
 UI.addFormListener();
 // let code = app.getLocaleCountryCode();
-// console.log('Country Code', code);
-// console.log(process.type);
+// console.trace('Country Code', code);
+// console.trace(process.type);
 

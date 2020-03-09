@@ -1,5 +1,17 @@
 'use strict';
 
+module.exports.files = {
+  databaseFile: 'test.db',
+  configFile: 'config'
+}
+
+module.exports.defaultConfig = {
+  dateFormat: '',
+  baseCurrency: '',
+  numberFormat: '',
+  deviceId: '' // should not have default
+}
+
 module.exports.transactionType = [
   { icon: '<i class="fas fa-money-bill-wave"></i>', name: 'Expense' }, 
   { icon: '<i class="fas fa-money-check-alt"></i>', name: 'Income' }, 
@@ -84,3 +96,7 @@ module.exports.icons = [
 module.exports.colors = [
   ''
 ];
+
+module.exports.CustomEvents = {
+
+}

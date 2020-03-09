@@ -1,11 +1,7 @@
 'use strict';
 
-function validateAmount() {
-  
-}
-
-function formValidated(results) {
-  console.log(results);
+function validateAmount(results) {
+  // console.trace(results);
 
   switch (results['transaction-type']) {
     case '0':
@@ -42,5 +38,5 @@ function formValidated(results) {
 }
 
 module.exports = {
-  formValidated
+  validateAmount
 }

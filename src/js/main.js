@@ -5,19 +5,26 @@ const { app, BrowserWindow } = require('electron');
 // const { DummyDB } = require('./model.reference');
 const { Model } = require('./model');
 const registerListener = require('./main.listener');
+// const { CountryISO } = require('./country.iso');
+const Config = require('./config');
 
 let mainWindow = null;
 const dbname = 'test.db';
 
+// Config.initDefault();
+const model = Model;
+model.init(dbname);
+
 function initMain() {
   const windowOptions = {
-    show: false,
+    // show: false,
     width: 1000,
     height: 650,
+    // height: 800,
     minWidth: 1000,
     minHeight: 650,
     title: app.name,
-    opacity: 0.98,
+    // opacity: 0.98,
     webPreferences: {
       defaultFontSize: 14,
       nodeIntegration: true
@@ -27,21 +34,24 @@ function initMain() {
   function createMainWindow() {
     mainWindow = new BrowserWindow(windowOptions);
     mainWindow.loadURL(path.join('file://', path.resolve(__dirname, '..'), 'html', 'index.html'));
-
     mainWindow.on('ready-to-show', () => {
-      mainWindow.show();
-    })
+      mainWindow.send('account:init', model.getAccount());
+      // mainWindow.show();
+      // send data here
+      // mainWindow.webContents.openDevTools();
+    });
+
     mainWindow.on('closed', () => {
       mainWindow = null;
     });
   }
-
+  app.disableHardwareAcceleration();
   app.on('ready', () => {
     createMainWindow();
-    const model = Model;
-    model.init(dbname);
+    // const db = Model;
+    // db.init(dbname);
     // const db = DummyDB;
-    registerListener(model, mainWindow);
+    registerListener(model, Config, mainWindow);
   }); // when app is ready
 
   app.on('window-all-closed', () => {
@@ -53,7 +63,7 @@ function initMain() {
   app.on('activate', () => {
     if (mainWindow === null)
       createMainWindow();
-    // console.log('app:activate');
+    // console.trace('app:activate');
   });
 }
 
@@ -65,7 +75,7 @@ function initMain() {
 initMain();
 // const db = new Database('people.db');
 // const stmt = db.prepare('SELECT COUNT(*) FROM sqlite_master WHERE type=?');
-// console.log(stmt.get('table'));
+// console.trace(stmt.get('table'));
 
 process.on('uncaughtException', (err) => {
   console.error((new Date).toLocaleString(), 'Uncaught Exception:', err.message);

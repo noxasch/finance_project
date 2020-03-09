@@ -1,11 +1,12 @@
-// business logic and take db input from main
+// handle model integration
 'use strict';
 const { ModelSQLite} = require('./model.sqlite');
-const { ModelHelper } = require('./model.helper');
+const { TransactionHelper } = require('./transaction.helper');
 
 const Model = (function() {
-  let lastItemId = null;
-  let account = null;
+  let lastItemId = null; 
+  let account = null; // temp storage
+  let totalBalance = null;
   return {
     init: function(dbname) {
       ModelSQLite.init(dbname);
@@ -14,26 +15,32 @@ const Model = (function() {
     },
 
     addTransaction: function(inputObj) {
-      let lastInsertRowId = null;
-      const processed = ModelHelper.processNew(inputObj, lastItemId, account);
-      if (processed.length > 0) {
-        lastInsertRowId = ModelSQLite.addMultipleTransaction(processed);
-        return ModelSQLite.getTransactionsByTransferId(processed[0].transferId);
-      }
-      if (processed.length === 1) {
-        lastInsertRowId = ModelSQLite.addTransaction(processed[0]);
-        return ModelSQLite.getTransactionById(lastInsertRowId);
-      }
+      let lastInsertRowid = null;
+      console.trace('INPUT OBJ: ', inputObj);
+      const processed = TransactionHelper.processInput(inputObj, lastItemId, account);
+      console.trace('PROCESSED:', processed);
+      // if (processed.length > 1) {
+      //   lastInsertRowId = ModelSQLite.addMultipleTransaction(processed);
+      //   // console.trace(lastInsertRowid);
+      //   return ModelSQLite.getTransactionsByTransferId(processed[0].transferId);
+      // }
+      // if (processed.length === 1) {
+      //   lastInsertRowid = ModelSQLite.addTransaction(processed[0]);
+      //   return ModelSQLite.getTransactionById(lastInsertRowid);
+      // }
     },
 
     getAllTransaction: function(limit = null) {
       const results = ModelSQLite.getAllTransaction(limit);
       lastItemId = results.length;
+      // console.trace('model\n',results);
       return results
     },
 
-    insertTransaction: function(itemId) {
-      return ModelSQLite.getTransactionById(itemId);
+    getTransaction: function(itemId) {
+      let row = ModelSQLite.getTransactionById(itemId);
+      // console.trace(row);
+      return row;
     },
 
     updateTransaction: function(input) {
@@ -50,20 +57,30 @@ const Model = (function() {
       return ModelSQLite.addAccount(inputObj);
     },
 
-    getAccount: function(accountId) {
-      return ModelSQLite.getAccount(accountId);
+    // return empty array or array of object
+    getAccount: function(accountId = null) {
+      let results = ModelSQLite.getAccount(accountId);
+      return results;
     },
 
-    getAllAccount: function () {
-      account = ModelSQLite.getAllAccount();
-      return account;
-    },
+    // getAllAccount: function () {
+    //   account = ModelSQLite.getAllAccount();
+    //   return account;
+    // },
 
     deleteAccount: function(itemId) {
       ModelSQLite.purgeAccount(itemId);
       return true;
-    }
+    },
 
+    getAccountBalance: function(accountId) {
+      return ModelSQLite.getAccountBalance(accountId);
+    },
+
+    getTotalBalance: function() {
+      let res = ModelSQLite.getAccountBalance();
+      if (res !== undefined) return res.total_balance;
+    }
   }
 })();
 

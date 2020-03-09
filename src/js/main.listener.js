@@ -5,53 +5,58 @@ const { WindowDialog } = require('./window.helper');
 
 let dialogWindow = null;
 let accountWindow = null;
+let transactionId = null;
 
-function registerListener(db, mainWindow) {
-  ipcMain.on('webview:ready', (event) => {
+function registerListener(db, config, mainWindow) {
+  ipcMain.on('home:ready', (event) => {
     const data = {
-      account: db.getAllAccount(),
-      transactions: db.getAllTransaction()
+      balance: db.getAccountBalance().total_balance,
+      transactions: db.getAllTransaction(10),
+      account: db.getAccount(),
+      baseCurrency: config.getBaseCurrency()
     }
-    event.sender.send('transaction:init', data);
+    mainWindow.send('home:init', data);
   });
 
-  ipcMain.on('form:submit', (event, results) => {
-    const newTransaction = db.insertTransaction(results);
+  ipcMain.on('transaction:add', (event, results) => {
+    console.trace('ADD TRANSACTION: ', results);
+    const newTransaction = db.addTransaction(results);
     const data = {
-      account: db.getAllAccount(),
-      transactions: db.getAllTransaction(),
+      account: db.getAccount(),
+      transactions: db.getAllTransaction(10),
       newTransaction: newTransaction
     };
-    event.sender.send('transaction:new', data);
+    mainWindow.send('transaction:new', data);
   });
 
-  ipcMain.on('delete:item', (event, itemId) => {
-    // console.log('delete', itemId);
+  ipcMain.on('transaction:delete', (event, itemId) => {
+    // console.trace('delete', itemId);
     db.deleteTransaction(itemId);
     const data = {
       account: db.getAllAccount(),
-      transactions: db.getAllTransaction(),
-      // newTransaction: null
+      transactions: db.getAllTransaction()
     };
-    // console.log(db.getAllTransaction());
     event.sender.send('transaction:init', data);
   });
 
-  ipcMain.on('update:item', (event, itemId) => {
-    // console.log(event);
-    // console.log(app.getAppPath());
-    // console.log(path.resolve(__dirname));
-    // console.log(path.resolve(__dirname, '..'));
+  ipcMain.on('transaction:window', (event, itemId) => {
+    transactionId = itemId;
     dialogWindow = WindowDialog.createUpdateDialog(mainWindow, path.join('file://', path.resolve(__dirname, '..'), 'html', 'update.window.html'));
-    ipcMain.on('dialog:ready', (event) => {
-      const itemData = db.getTransaction(itemId)[0];
-      dialogWindow.send('data:init', itemData);
-    });
   });
 
-  ipcMain.on('form:update', (event, result) => {
+  ipcMain.on('transaction:window:ready', (event) => {
+    const data = {
+      account: db.getAllAccount(),
+      transaction: db.getTransaction(transactionId),
+    };
+    console.trace('UPDATE', data);
+    event.sender.send('data:init', data);
+  });
+
+  ipcMain.on('transaction:update', (event, result) => {
     db.updateTransaction(result);
-    // console.log(event);
+    transactionId = null;
+    // console.trace(event);
     const data = {
       account: db.getAllAccount(),
       transactions: db.getAllTransaction(),
@@ -59,28 +64,26 @@ function registerListener(db, mainWindow) {
     mainWindow.send('transaction:init', data);
   });
 
-  ipcMain.on('init:account', (event) => {
+  ipcMain.on('account:window', (_) => {
     accountWindow = WindowDialog.createAccountDialog(mainWindow, path.join('file://', path.resolve(__dirname, '..'), 'html', 'account.window.html'));
   });
 
-  ipcMain.on('add:account', (event, result) => {
-    console.log(result);
+  ipcMain.on('account:add', (_, result) => {
+    // console.trace(result);
+    // db.addAccount(result);
     try {
       let accountId = db.addAccount(result);
-      // console.log(accountId);
+      // console.trace(accountId);
       let account = db.getAccount(accountId);
-      mainWindow.send('data:update', account);
+      mainWindow.send('index:update', account);
     } catch (error) {
       if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
-        console.log('Error: Account with the same name already exist');
+        console.error('Error: Account with the same name already exist');
       } else {
         throw error; // unexpected error
       }
-      // console.log(error)
-      // console.log('CODE:', error.code);
-      // console.log('message:', error.message);
     }
-
+    mainWindow.send('account:init', db.getAccount());
   });
 
 }

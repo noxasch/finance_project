@@ -9,7 +9,7 @@ const WindowDialog = (function () {
   const windowOptions = {
     show: false,
     width: 500,
-    height: 520,
+    height: 665,
     webPreferences: {
       defaultFontSize: 14,
       nodeIntegration: true
@@ -17,6 +17,7 @@ const WindowDialog = (function () {
   }
 
   return {
+    // TODO: add separate method for expense/income and transfer for preoper windows size
     createUpdateDialog: function (parent, filePath) {
       windowOptions['parent'] = parent;
       updateDialog = new BrowserWindow(windowOptions);
@@ -32,7 +33,7 @@ const WindowDialog = (function () {
 
     createAccountDialog: function (parent, filePath) {
       windowOptions['parent'] = parent;
-      windowOptions.height = 380;
+      windowOptions.height = 632;
       accountDialog = new BrowserWindow(windowOptions);
       accountDialog.loadURL(filePath);
       accountDialog.on('ready-to-show', () => {

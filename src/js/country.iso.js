@@ -22,8 +22,13 @@ module.exports.CountryISO = (function() {
      * 
      * @param {string} code 
      */
-    getCountryInfo: function(code) {
+    getCountryInfoByISOCode: function(code) {
       let item = countryinfo.filter((item) => item.ISO_2 === code);
+      if (item.length > 0) return item[0];
+    },
+
+    getCountryInfoByCurrency(curr) {
+      let item = countryinfo.filter((item) => item.currency === curr);
       if (item.length > 0) return item[0];
     },
 

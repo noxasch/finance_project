@@ -1,7 +1,7 @@
 'use strict';
+
 const { toLocaleFixed  } = require('./timedate.helper');
 const { transactionType } = require('./constant');
-const { formValidated } = require('./form.validate.helper');
 const { category } = require('./constant');
 
 
@@ -9,14 +9,6 @@ module.exports.TransactionInputUI = (function () {
   let state = null;
   let accountStore = null;
   const UISelectors = {
-    // form: 'update-transaction-form',
-    // transactionInput: 'transaction-input',
-    // accountFrom: 'account-input-from',
-    // accountTo: 'account-input-to',
-    // dateInput: 'date-input',
-    // amountInput: 'amount-input',
-    // labelInput: 'label-input',
-    // categoryInput: 'category-input',
     transactionType: 'transaction-type',
     accountFrom: 'account-from',
     amountFrom: 'amount-from',
@@ -25,7 +17,9 @@ module.exports.TransactionInputUI = (function () {
     label: 'label-input',
     date: 'date-input',
     categorySelect: 'category-input',
-    form: 'transaction-form'
+    form: 'transaction-form', // handled by specific view
+    cancelBtn: 'cancel', // this handled by update.window.js
+    ex_rate: 'exrate'
   }
 
   function validateAndConvertToMoney(e) {
@@ -41,8 +35,6 @@ module.exports.TransactionInputUI = (function () {
       e.target.setCustomValidity('Amount can only be numbers');
     }
   }
-
-
 
   function hideAccountTo() {
     document.getElementById(UISelectors.accountTo).parentElement.parentElement.classList.add('hide');
@@ -92,15 +84,25 @@ module.exports.TransactionInputUI = (function () {
     document.getElementById(UISelectors.categorySelect).removeAttribute('disabled');
   }
 
+  function showExchangeRate() {
+    document.getElementById(UISelectors.ex_rate).parentElement.classList.remove('hide');
+    document.getElementById(UISelectors.ex_rate).removeAttribute('disabled');
+  }
+
+  function hideExchangeRate() {
+    document.getElementById(UISelectors.ex_rate).parentElement.classList.add('hide');
+    document.getElementById(UISelectors.ex_rate).setAttribute('disabled', true);
+  }
+
   function updateAccountFrom(data) {
     const select = document.getElementById(UISelectors.accountFrom);
     while (select.firstChild) select.removeChild(select.firstChild);
     let fragment = document.createDocumentFragment();
     data.forEach((item) => {
-      console.log(item);
+      // console.trace(item);
       const opt = document.createElement('option');
       opt.value = item.id;
-      opt.textContent = item.account_name;
+      opt.textContent = item.name;
       fragment.appendChild(opt);
       // <option value="1">Bank A</option>
     });
@@ -112,10 +114,10 @@ module.exports.TransactionInputUI = (function () {
     while (select.firstChild) select.removeChild(select.firstChild);
     let fragment = document.createDocumentFragment();
     data.forEach((item) => {
-      console.log(item);
+      // console.trace(item);
       const opt = document.createElement('option');
       opt.value = item.id;
-      opt.textContent = item.account_name;
+      opt.textContent = item.name;
       fragment.appendChild(opt);
       // <option value="1">Bank A</option>
     });
@@ -140,7 +142,7 @@ module.exports.TransactionInputUI = (function () {
     dateInput.valueAsNumber = today;
   }
 
-  function initCategory() {
+  function resetCategory() {
     const select = document.getElementById(UISelectors.categorySelect);
     while (select.firstChild) select.removeChild(select.firstChild);
     let fragment = document.createDocumentFragment();
@@ -173,20 +175,36 @@ module.exports.TransactionInputUI = (function () {
         hideAccountTo();
         showCategory();
         showLabel();
+        hideExchangeRate();
       }
       if (e.target.value === '1') {
         showAccountTo();
         hideAccountFrom();
         showCategory();
         showLabel();
+        hideExchangeRate();
       }
       if (e.target.value === '2') {
         showAccountFrom();
         showAccountTo();
         hideLabel();
         hideCategory();
+        showExchangeRate();
       }
     });
+  }
+
+  function resetExchangeRate() {
+    document.getElementById(UISelectors.ex_rate).value = '1.0000';
+  };
+
+  function resetAmount() {
+    document.getElementById(UISelectors.amountFrom).value = '';
+    document.getElementById(UISelectors.amountTo).value = '';
+  }
+
+  function resetLabel() {
+    document.getElementById(UISelectors.label).value = '';
   }
 
   function resetTransactionOption() {
@@ -204,16 +222,16 @@ module.exports.TransactionInputUI = (function () {
     hideAccountTo();
   }
 
-
   return {
 
     initForm: function(data) {
-      // console.log(data);
+      console.trace(data);
       // accountStore = data;
       resetTransactionOption();
       setTodaysDate();
-      initCategory();
+      resetCategory();
       resetAccount(data);
+      resetExchangeRate();
     }, 
 
     initEventListener: function() {
@@ -222,6 +240,27 @@ module.exports.TransactionInputUI = (function () {
       initTransactionTypeListener();
       initFormChangeListener();
     },
+
+    showAmountFromError: function() {
+      document.getElementById(UISelectors.amountFrom).setCustomValidity('invalid input');
+      // document.getElementById(UISelectors.amountFrom).reportValidity();
+    },
+
+    showAmountToError: function () {
+      document.getElementById(UISelectors.amountTo).setCustomValidity('invalid input');
+      // document.getElementById(UISelectors.amountTo).reportValidity();
+    },
+
+    resetForm: function() {
+      // document.getElementById(UISelectors.form).reset();
+      resetAmount();
+      resetLabel();
+      resetExchangeRate();
+      resetTransactionOption();
+      resetCategory();
+      setTodaysDate();
+    }
+
   }
 })();
 

@@ -1,7 +1,6 @@
 'use strict';
-
 const { ipcRenderer } = require('electron');
-const { transactionModel } = require('./transaction.model');
+const Transaction = require('./transaction');
 const { CountryISO } = require('./country.iso');
 const { toLocaleFixed, convertDate, compareDate } = require('./timedate.helper');
 
@@ -9,13 +8,13 @@ const UIController = (function () {
   const maxRow = 10;
   let baseCurrency = null;
   let currencySymbol = null;
-  const parentName = '.table__body';
+  const tableSelector = '.table__body';
   const idLabel = {
     '.table__body': 'home-row'
   }
 
   const animateValue = function (selector, end, duration = 500) {
-    // console.log(end);
+    // console.trace(end);
     const el = document.querySelector(selector);
     const start = parseFloat(el.textContent.replace(',', ''));
     const range = end - start;
@@ -43,28 +42,31 @@ const UIController = (function () {
 
   return {
 
-    setCurrencyInfo: function(info) {
+    setCurrencyInfo: function(base) {
+      let info = CountryISO.getCountryInfoByCurrency(base)
+      // console.trace(info);
       baseCurrency = info.currency;
       currencySymbol = info.symbol;
+      // currencySymbol = info;
     },
 
     deleteRow: function (id) {
-      const rowId = `${idLabel[parentName]}-${id}`;
+      const rowId = `${idLabel[tableSelector]}-${id}`;
       // document.getElementById(rowId).remove();
-      console.log(document.getElementById(rowId).children);
+      console.trace(document.getElementById(rowId).children);
     },
 
     clearTable: function () {
-      const table = document.querySelector(parentName);
+      const table = document.querySelector(tableSelector);
       while (table.firstChild) table.removeChild(table.firstChild);
     },
 
-    renderTransactions: function (data = null) {
+    renderTransactions: function (data) {
 
-      const table = document.querySelector(parentName);
+      const table = document.querySelector(tableSelector);
       let rows = '';
       const { account, transactions } = data;
-      // console.log(transactions);
+      // console.trace(transactions);
       if (transactions) {
         // transactions.reverse();
         transactions.sort((a, b) => compareDate(a.transaction_date, b.transaction_date));
@@ -74,7 +76,12 @@ const UIController = (function () {
             priceColor = 'text--red';
           }
           let currentAccount = account.filter((acc) => acc.id === item.account_id);
-          console.log(item.transaction_date);
+          // console.trace(account);
+          // console.trace(item.transaction_date);
+          // console.trace(item);
+          // console.trace(currentAccount);
+          // console.trace(currentAccount[0]);
+          console.trace(currencySymbol);
           let date = convertDate(item.transaction_date);
           rows += `<tr class="row" data-id="${item.id}">
             <td class="table-cell">
@@ -97,22 +104,22 @@ const UIController = (function () {
         table.insertAdjacentHTML('afterbegin', rows);
         while (parseInt(table.childElementCount) > maxRow) table.removeChild(table.lastChild);
       } else {
-        console.log('no data to be render');
+        console.trace('no data to render');
       }
     },
 
     updateTransaction: function (data) {
       const { account, item } = data;
-      console.log(item);
-      console.log(`${idLabel[parentName]}-${item.id}`);
+      // console.trace(item);
+      // console.trace(`${idLabel[parentName]}-${item.id}`);
       const row = document.getElementById(`${idLabel[parentName]}-${item.id}`);
-      console.log(row);
+      // console.trace(row);
       let currentAccount = account.filter((acc) => acc.id === item.account_id);
-      // console.log(row.childNodes);
-      console.log(row.children);
-      console.log(row.children[0].textContent);
-      console.log(row.children[0].childNodes[0].textContent);
-      console.log(row.children[0].children[0].innerText);
+      // console.trace(row.childNodes);
+      // console.trace(row.children);
+      // console.trace(row.children[0].textContent);
+      // console.trace(row.children[0].childNodes[0].textContent);
+      // console.trace(row.children[0].children[0].innerText);
       row.children[0].childNodes[0].textContent = `${item.label} `;
       row.children[0].childNodes[1].textContent = `(${currentAccount.account_name})`;
       row.children[1].childNodes[0].textContent = `${convertDate(item.transaction_date)}`;
@@ -140,7 +147,7 @@ const dropdownHandler = function (e) {
       document.querySelector('.dropdown-menu.show').classList.remove('show');
     let itemId = e.target.parentNode.parentNode.parentNode.dataset.id;
     // itemId = itemId.split('-');
-    transactionModel.setCurrentItem(itemId[itemId.length - 1]);
+    Transaction.setCurrentItem(itemId[itemId.length - 1]);
     e.target.nextElementSibling.classList.toggle('show');
   } else if (document.querySelector('.dropdown-menu.show') !== null) {
     document.querySelector('.dropdown-menu.show').classList.remove('show');
@@ -150,8 +157,8 @@ const dropdownHandler = function (e) {
 const editItemHandler = function (e) {
   if (e.target.parentNode.classList.contains('dropdown-menu')) {
     if (e.target.classList.contains('edit')) {
-      const itemId = transactionModel.getCurrentItem();
-      console.log('edit', itemId);
+      const itemId = Transaction.getCurrentItem();
+      console.trace('edit', itemId);
       ipcRenderer.send('update:item', itemId);
     }
   }
@@ -162,10 +169,10 @@ const deleteItemHandler = function (e) {
     if (e.target.classList.contains('delete')) {
       // handle deletion
       // remove from display
-      const itemId = transactionModel.getCurrentItem();
-      console.log('deleting', itemId);
+      const itemId = Transaction.getCurrentItem();
+      console.trace('deleting', itemId);
       // UIController.deleteRow(itemId);
-      // transactionModel.deleteCurrentItem();
+      // Transaction.deleteCurrentItem();
       // remove from db - delete when db confirm deletion
       ipcRenderer.send('delete:item', itemId);
     }
@@ -181,28 +188,41 @@ document.addEventListener('click', (e) => {
 ipcRenderer.send('home:ready');
 
 ipcRenderer.on('home:init', (_, data) => {
-  console.log(data);
+  // first load and edit
+  UIController.clearTable();
   UIController.setCurrencyInfo(data.baseCurrency);
   UIController.updateTotalBalance(data.balance);
   UIController.renderTransactions(data);
-})
-
-ipcRenderer.on('transaction:init', (e, data) => {
-  console.log('transaction init');
-  // console.log(data);
-  UIController.clearTable();
-  UIController.renderTransactions(data);
-  console.log(data.transactions);
-  UIController.updateTotalBalance(transactionModel.getTotalBalance(data.transactions));
 });
 
-ipcRenderer.on('home:new:transaction', (e, data) => {
-  // console.log('transaction new');
-  UIController.updateTotalBalance(transactionModel.getTotalBalance(data.transactions));
-  UIController.renderTransactions({ account: data.account, transactions: data.newTransaction });
+ipcRenderer.on('home:balance', (_, data) => {
+  // update balance after deletion
 });
 
-ipcRenderer.on('transaction:balance', (e, data) => {
-  // console.log('transaction balance');
-  UIController.updateTotalBalance(transactionModel.getTotalBalance(data.transactions));
+ipcRenderer.on('home:transaction', (_, data) => {
+  // new transaction
 });
+
+ipcRenderer.on('home:chart', (_, data) => {
+
+});
+
+// ipcRenderer.on('transaction:init', (e, data) => {
+//   console.trace('transaction init');
+//   // console.trace(data);
+//   UIController.clearTable();
+//   UIController.renderTransactions(data);
+//   console.trace(data.transactions);
+//   UIController.updateTotalBalance(Transaction.getTotalBalance(data.transactions));
+// });
+
+// ipcRenderer.on('home:new:transaction', (e, data) => {
+//   // console.trace('transaction new');
+//   UIController.updateTotalBalance(Transaction.getTotalBalance(data.transactions));
+//   UIController.renderTransactions({ account: data.account, transactions: data.newTransaction });
+// });
+
+// ipcRenderer.on('transaction:balance', (e, data) => {
+//   // console.trace('transaction balance');
+//   UIController.updateTotalBalance(Transaction.getTotalBalance(data.transactions));
+// });

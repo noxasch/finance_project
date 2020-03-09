@@ -4,7 +4,12 @@
      * @param {Number} value 
      */
 function toLocaleFixed(value) {
+  
+  const digit = /\d+\.?\,?\d +/ig;
+  const symbol = /[^0-9\.\,\s]+/ig
+
   return (value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  // from the output we gonna split the Currency Symbol and actual value
 }
 
 function toUnixTimeStamp(dateString) {
@@ -23,10 +28,11 @@ function convertDate(date) {
 
 /**
  * reverse the dummy model order
- * @param {string} a - datetime a
- * @param {string} b - datetime b
+ * @param {string} a - transaction_date a
+ * @param {string} b - transaction_date b
  */
 function compareDate(a, b) {
+  // console.trace(a, b);
   // consider comverting to unixtimestamp in case of performance degradation
   if (new Date(a.replace(/-/g, '/')) > new Date(b.replace(/-/g, '/'))) return -1;
   if (new Date(a.replace(/-/g, '/')) < new Date(b.replace(/-/g, '/'))) return 1;
@@ -34,7 +40,6 @@ function compareDate(a, b) {
 }
 
 module.exports = { 
-  // TransactionHelper,
   convertDate,
   compareDate,
   toUnixTimeStamp,
