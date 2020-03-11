@@ -8,9 +8,8 @@ let accountWindow = null;
 let transactionId = null;
 
 function registerListener(db, config, mainWindow) {
-  ipcMain.on('home:ready', (event) => {
+  ipcMain.on('home:view:ready', (event) => {
     const data = {
-      balance: db.getAccountBalance().total_balance,
       transactions: db.getAllTransaction(10),
       account: db.getAccount(),
       baseCurrency: config.getBaseCurrency()
@@ -20,14 +19,13 @@ function registerListener(db, config, mainWindow) {
 
   ipcMain.on('transaction:add', (event, results) => {
     // console.log('ADD TRANSACTION: ', results);
-    const newTransaction = db.addTransaction(results);
+    // const newTransaction = db.addTransaction(results);
     // const data = {
     //   account: db.getAccount(),
     //   transactions: db.getAllTransaction(10),
     //   newTransaction: newTransaction
     // };
     const data = {
-      balance: db.getAccountBalance().total_balance,
       transactions: db.getAllTransaction(10),
       account: db.getAccount(),
       // baseCurrency: config.getBaseCurrency()
@@ -91,6 +89,14 @@ function registerListener(db, config, mainWindow) {
       }
     }
     // mainWindow.send('account:init', db.getAccount());
+  });
+
+  // sections listener
+  ipcMain.on('account:view:ready', (_) => {
+    const data = {
+      account: db.getAccount(),
+    }
+    mainWindow.send('account:view:init', data);
   });
 
 }

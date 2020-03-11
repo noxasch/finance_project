@@ -95,14 +95,23 @@ const ModelSQLite = (function () {
    */
   function getAccount(accountid = null) {
     // console.log(accountid);
+    let sql = `SELECT *, (SELECT SUM(amount) FROM ${table.transaction} WHERE transactions.purged <> 1 
+    AND ${table.transaction}.account_id = ${table.account}.id) as balance FROM ${table.account}`.replace(/\s+/g, ' ');
     if (accountid) {
       // console.log('JEM');
-      let sql = `SELECT * FROM ${table.account} WHERE id = ?`;
+      sql += ` WHERE id = ?`;
       return db.prepare(sql).get([accountid]);
     }
-    let stmt = db.prepare(`SELECT * FROM ${table.account} WHERE purged <> 1;`)
+    sql = `SELECT *, (SELECT SUM(amount) FROM ${table.transaction} WHERE transactions.purged <> 1 
+    AND ${table.transaction}.account_id = ${table.account}.id) as balance FROM ${table.account};`.replace(/\s+/g, ' ');
+    let stmt = db.prepare(sql);
     let rows = stmt.all();
     return rows;
+  }
+
+  function getAccountByCurrency(currency) {
+    let sql = `SELECT * FROM ${table.account} WHERE purged <> 1 AND currency = ?`;
+    return db.prepare(sql).all(currency);
   }
 
   function updateAccount(accountObj) {
@@ -123,6 +132,8 @@ const ModelSQLite = (function () {
     }
     sql = `SELECT SUM(${table.transaction}.amount) + (SELECT SUM(initial_balance) FROM ${table.account} WHERE include_in_total = 1 AND purged <> 1) as total_balance FROM ${table.transaction} INNER JOIN  ${table.account} WHERE ${table.account}.include_in_total = 1 AND ${table.transaction}.account_id = ${table.account}.id`;
     return db.prepare(sql).get();
+    // need to refactor this
+    // calculate balance per account and sum it up
   }
 
   // function getTransactionSumByType() {
@@ -240,6 +251,7 @@ const ModelSQLite = (function () {
 
     // getTransactionSum,
     getAccountBalance,
+    getAccountByCurrency
   }
 })();
 

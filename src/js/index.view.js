@@ -4,11 +4,21 @@ const toggle = document.getElementById('right-toggle');
 const rightMenu = document.querySelector('.grid-container__right');
 const btn_account = document.getElementById('addaccount');
 
+let currentSection = '#home';
+
 // nav
 window.addEventListener('hashchange', (e) => {
   if (document.querySelector(`${window.location.hash}`) !== null) {
-    document.querySelector('section.show').classList.remove('show');
-    document.querySelector(`${window.location.hash}`).classList.add('show');
+    console.log(window.location.hash);
+    console.log(currentSection);
+    if (window.location.hash !== currentSection){
+      const prevSection = document.querySelector('section.show');
+      window.postMessage(`${prevSection.id.replace('#', '')}:view:clear`);
+      prevSection.classList.remove('show');
+      document.querySelector(`${window.location.hash}`).classList.add('show');
+      ipcRenderer.send(`${window.location.hash.replace('#', '')}:view:ready`);
+      currentSection = window.location.hash;
+    }
   }
   document.querySelector('.menu-box__link.active').classList.remove('active');
   document.querySelector(`.menu-box__link[href="${window.location.hash}"]`).classList.add('active');

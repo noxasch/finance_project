@@ -8,7 +8,7 @@ const UIController = (function () {
   const maxRow = 10;
   let baseCurrency = null;
   let currencySymbol = null;
-  const tableSelector = '.table__body';
+  const tableSelector = '#home .table__body';
   const idLabel = {
     '.table__body': 'home-row'
   }
@@ -57,7 +57,9 @@ const UIController = (function () {
     },
 
     clearTable: function () {
+      // console.log(tableSelector);
       const table = document.querySelector(tableSelector);
+      // console.log(table);
       while (table.firstChild) table.removeChild(table.firstChild);
     },
 
@@ -100,7 +102,7 @@ const UIController = (function () {
                 </div>
               </span>
             </td>
-          </tr>`;
+          </tr>`.replace(/\s+/g, ' ');
         });
         table.insertAdjacentHTML('afterbegin', rows);
         while (parseInt(table.childElementCount) > maxRow) table.removeChild(table.lastChild);
@@ -127,7 +129,12 @@ const UIController = (function () {
       row.children[1].childNodes[0].textContent = `${convertDate(item.transaction_date)}`;
     },
 
-    updateTotalBalance: function (balance) {
+    updateTotalBalance: function (data) {
+      let balance = 0;
+      data.account.forEach((item) => {
+        if (item.currency === baseCurrency) balance += (item.balance + item.initial_balance);
+        else console.log(item.currency); // calculate and then convert based on latest FX rate
+      });
       animateValue('.card__amount', balance);
       if (parseFloat(balance) < 0) {
         document.querySelector('.card__amount').classList.add('text--red');
@@ -187,20 +194,20 @@ document.addEventListener('click', (e) => {
   deleteItemHandler(e);
 });
 
-ipcRenderer.send('home:ready');
+ipcRenderer.send('home:view:ready');
 
 ipcRenderer.on('home:init', (_, data) => {
   // first load and edit
   UIController.clearTable();
   UIController.setCurrencyInfo(data.baseCurrency);
-  UIController.updateTotalBalance(data.balance);
+  UIController.updateTotalBalance(data);
   UIController.renderTransactions(data);
 });
 
 ipcRenderer.on('home:transaction:update', (_, data) => {
   // first load and edit
   UIController.clearTable();
-  UIController.updateTotalBalance(data.balance);
+  UIController.updateTotalBalance(data);
   UIController.renderTransactions(data);
 });
 
