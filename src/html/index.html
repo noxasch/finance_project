@@ -13,6 +13,7 @@
   <link rel="import" href="analytics.template.html">
   <link rel="import" href="transactions.template.html">
   <link rel="import" href="settings.template.html">
+  <link rel="import" href="account.template.html">
 </head>
 
 <body>
@@ -36,7 +37,7 @@
                 class="fas fa-chart-bar"></i>&nbsp;&nbsp;Analytics</a></li>
           <li class="menu-box__item"><a href="#transactions" class="menu-box__link"><i
                 class="fas fa-book"></i>&nbsp;&nbsp;Transaction</a></li>
-          <li class="menu-box__item"><a href="javascript:void(0)" class="menu-box__link"><i
+          <li class="menu-box__item"><a href="#account" class="menu-box__link"><i
                 class="fas fa-landmark"></i>&nbsp;&nbsp;Accounts</a><button title="Add Account" id="addaccount" type="button"
               class="menu-box--shortcut">+</button></li>
           <li class="menu-box__item"><a href="#settings" class="menu-box__link"><i
@@ -114,7 +115,9 @@
     require('../js/index.view.js');
     require('../js/main.template.loader');
     require('../js/chart.helper');
+    require('../js/home.view');
     require('../js/index.input.view');
+    require('../js/account.view');
   </script>
 </body>
 
