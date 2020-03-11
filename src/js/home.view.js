@@ -4,7 +4,7 @@ const Transaction = require('./transaction');
 const { CountryISO } = require('./country.iso');
 const { toLocaleFixed, convertDate, compareDate, fromUnixTimeStamp } = require('./timedate.helper');
 
-const UIController = (function () {
+const HomeUI = (function () {
   const maxRow = 10;
   let baseCurrency = null;
   let currencySymbol = null;
@@ -180,7 +180,7 @@ const deleteItemHandler = function (e) {
       // remove from display
       const itemId = Transaction.getCurrentItem();
       console.log('deleting', itemId);
-      // UIController.deleteRow(itemId);
+      // HomeUI.deleteRow(itemId);
       // Transaction.deleteCurrentItem();
       // remove from db - delete when db confirm deletion
       ipcRenderer.send('delete:item', itemId);
@@ -198,17 +198,21 @@ ipcRenderer.send('home:view:ready');
 
 ipcRenderer.on('home:init', (_, data) => {
   // first load and edit
-  UIController.clearTable();
-  UIController.setCurrencyInfo(data.baseCurrency);
-  UIController.updateTotalBalance(data);
-  UIController.renderTransactions(data);
+  HomeUI.clearTable();
+  HomeUI.setCurrencyInfo(data.baseCurrency);
+  HomeUI.updateTotalBalance(data);
+  HomeUI.renderTransactions(data);
 });
 
 ipcRenderer.on('home:transaction:update', (_, data) => {
   // first load and edit
-  UIController.clearTable();
-  UIController.updateTotalBalance(data);
-  UIController.renderTransactions(data);
+  HomeUI.clearTable();
+  HomeUI.updateTotalBalance(data);
+  HomeUI.renderTransactions(data);
+});
+
+window.addEventListener('message', (e) => {
+  if (e.data === 'home:view:clear') HomeUI.clearTable();
 });
 
 // ipcRenderer.on('home:balance', (_, data) => {
@@ -226,19 +230,19 @@ ipcRenderer.on('home:transaction:update', (_, data) => {
 // ipcRenderer.on('transaction:init', (e, data) => {
 //   console.log('transaction init');
 //   // console.log(data);
-//   UIController.clearTable();
-//   UIController.renderTransactions(data);
+//   HomeUI.clearTable();
+//   HomeUI.renderTransactions(data);
 //   console.log(data.transactions);
-//   UIController.updateTotalBalance(Transaction.getTotalBalance(data.transactions));
+//   HomeUI.updateTotalBalance(Transaction.getTotalBalance(data.transactions));
 // });
 
 // ipcRenderer.on('home:new:transaction', (e, data) => {
 //   // console.log('transaction new');
-//   UIController.updateTotalBalance(Transaction.getTotalBalance(data.transactions));
-//   UIController.renderTransactions({ account: data.account, transactions: data.newTransaction });
+//   HomeUI.updateTotalBalance(Transaction.getTotalBalance(data.transactions));
+//   HomeUI.renderTransactions({ account: data.account, transactions: data.newTransaction });
 // });
 
 // ipcRenderer.on('transaction:balance', (e, data) => {
 //   // console.log('transaction balance');
-//   UIController.updateTotalBalance(Transaction.getTotalBalance(data.transactions));
+//   HomeUI.updateTotalBalance(Transaction.getTotalBalance(data.transactions));
 // });

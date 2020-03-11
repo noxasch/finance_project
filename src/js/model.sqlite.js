@@ -157,7 +157,7 @@ const ModelSQLite = (function () {
   }
 
   function getAllTransaction(limit = null) {
-    let sql = `SELECT * FROM ${table.transaction} WHERE purged <> 1`;
+    let sql = `SELECT * FROM ${table.transaction} WHERE purged <> 1 ORDER BY transaction_date`;
     if (typeof limit === "number") sql += ` LIMIT ${limit}`;
     // console.log(sql);
     let rows = db.prepare(sql).all();

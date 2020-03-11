@@ -47,7 +47,5 @@ ipcRenderer.on('account:view:init', (_, data) => {
 });
 
 window.addEventListener('message', (e) => {
-  if (e.data === 'account:view:clear') {
-    AccountUI.clear();
-  }
+  if (e.data === 'account:view:clear') AccountUI.clear();
 });
