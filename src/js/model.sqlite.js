@@ -3,7 +3,7 @@
 const Database = require('better-sqlite3');
 
 // sqlite interface
-// we also need the business model
+// TODO: expose the funciton directly because this is getting ridiculous
 
 const ModelSQLite = (function () {
   let db = null;
@@ -147,7 +147,7 @@ const ModelSQLite = (function () {
   function getTransactionById(itemId) {
     // console.log(itemId);
     let sql = `SELECT * FROM ${table.transaction} WHERE id = ?`;
-    return db.prepare(sql).all([itemId]);
+    return db.prepare(sql).get([itemId]);
   }
 
   function getTransactionsByTransferId(transferId) {
@@ -157,7 +157,7 @@ const ModelSQLite = (function () {
   }
 
   function getAllTransaction(limit = null) {
-    let sql = `SELECT * FROM ${table.transaction} WHERE purged <> 1 ORDER BY transaction_date`;
+    let sql = `SELECT * FROM ${table.transaction} WHERE purged <> 1 ORDER BY date_added DESC, transaction_date DESC`;
     if (typeof limit === "number") sql += ` LIMIT ${limit}`;
     // console.log(sql);
     let rows = db.prepare(sql).all();

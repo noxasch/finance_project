@@ -26,7 +26,7 @@ function initMain() {
     title: app.name,
     opacity: 0.98,
     webPreferences: {
-      defaultFontSize: 14,
+      defaultFontSize: Config.getConfig().fontSize,
       nodeIntegration: true
     }
   }

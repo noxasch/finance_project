@@ -40,6 +40,44 @@ const HomeUI = (function () {
     run();
   }
 
+  const dropdownHandler = function (e) {
+    if (e.target.parentNode.classList.contains('dropdown')) {
+      if (document.querySelector('.dropdown-menu.show') !== null && document.querySelector('.dropdown-menu.show') !== e.target.nextElementSibling)
+        document.querySelector('.dropdown-menu.show').classList.remove('show');
+      let itemId = e.target.parentNode.parentNode.parentNode.dataset.id;
+      // itemId = itemId.split('-');
+      Transaction.setCurrentItem(itemId[itemId.length - 1]);
+      e.target.nextElementSibling.classList.toggle('show');
+    } else if (document.querySelector('.dropdown-menu.show') !== null) {
+      document.querySelector('.dropdown-menu.show').classList.remove('show');
+    }
+  }
+
+  const editItemHandler = function (e) {
+    if (e.target.parentNode.classList.contains('dropdown-menu')) {
+      if (e.target.classList.contains('edit')) {
+        const itemId = Transaction.getCurrentItem();
+        console.log('edit', itemId);
+        ipcRenderer.send('update:item', itemId);
+      }
+    }
+  }
+
+  const deleteItemHandler = function (e) {
+    if (e.target.parentNode.classList.contains('dropdown-menu')) {
+      if (e.target.classList.contains('delete')) {
+        // handle deletion
+        // remove from display
+        const itemId = Transaction.getCurrentItem();
+        console.log('deleting', itemId);
+        // HomeUI.deleteRow(itemId);
+        // Transaction.deleteCurrentItem();
+        // remove from db - delete when db confirm deletion
+        ipcRenderer.send('transaction:delete', itemId);
+      }
+    }
+  }
+
   return {
 
     setCurrencyInfo: function(base) {
@@ -144,55 +182,64 @@ const HomeUI = (function () {
         document.querySelector('.card__amount').classList.remove('text--red');
         document.querySelector('.card__currency').classList.remove('text--red');
       }
+    },
+
+    rowEventListener: function() {
+      document.querySelector(tableSelector).addEventListener('click', (e) => {
+        dropdownHandler(e);
+        editItemHandler(e);
+        deleteItemHandler(e);
+      })
     }
   }
 })();
 
 // on submit - reset account choice
 
-const dropdownHandler = function (e) {
-  if (e.target.parentNode.classList.contains('dropdown')) {
-    if (document.querySelector('.dropdown-menu.show') !== null && document.querySelector('.dropdown-menu.show') !== e.target.nextElementSibling)
-      document.querySelector('.dropdown-menu.show').classList.remove('show');
-    let itemId = e.target.parentNode.parentNode.parentNode.dataset.id;
-    // itemId = itemId.split('-');
-    Transaction.setCurrentItem(itemId[itemId.length - 1]);
-    e.target.nextElementSibling.classList.toggle('show');
-  } else if (document.querySelector('.dropdown-menu.show') !== null) {
-    document.querySelector('.dropdown-menu.show').classList.remove('show');
-  }
-}
+// const dropdownHandler = function (e) {
+//   if (e.target.parentNode.classList.contains('dropdown')) {
+//     if (document.querySelector('.dropdown-menu.show') !== null && document.querySelector('.dropdown-menu.show') !== e.target.nextElementSibling)
+//       document.querySelector('.dropdown-menu.show').classList.remove('show');
+//     let itemId = e.target.parentNode.parentNode.parentNode.dataset.id;
+//     // itemId = itemId.split('-');
+//     Transaction.setCurrentItem(itemId[itemId.length - 1]);
+//     e.target.nextElementSibling.classList.toggle('show');
+//   } else if (document.querySelector('.dropdown-menu.show') !== null) {
+//     document.querySelector('.dropdown-menu.show').classList.remove('show');
+//   }
+// }
 
-const editItemHandler = function (e) {
-  if (e.target.parentNode.classList.contains('dropdown-menu')) {
-    if (e.target.classList.contains('edit')) {
-      const itemId = Transaction.getCurrentItem();
-      console.log('edit', itemId);
-      ipcRenderer.send('update:item', itemId);
-    }
-  }
-}
+// const editItemHandler = function (e) {
+//   if (e.target.parentNode.classList.contains('dropdown-menu')) {
+//     if (e.target.classList.contains('edit')) {
+//       const itemId = Transaction.getCurrentItem();
+//       console.log('edit', itemId);
+//       ipcRenderer.send('update:item', itemId);
+//     }
+//   }
+// }
 
-const deleteItemHandler = function (e) {
-  if (e.target.parentNode.classList.contains('dropdown-menu')) {
-    if (e.target.classList.contains('delete')) {
-      // handle deletion
-      // remove from display
-      const itemId = Transaction.getCurrentItem();
-      console.log('deleting', itemId);
-      // HomeUI.deleteRow(itemId);
-      // Transaction.deleteCurrentItem();
-      // remove from db - delete when db confirm deletion
-      ipcRenderer.send('delete:item', itemId);
-    }
-  }
-}
+// const deleteItemHandler = function (e) {
+//   if (e.target.parentNode.classList.contains('dropdown-menu')) {
+//     if (e.target.classList.contains('delete')) {
+//       // handle deletion
+//       // remove from display
+//       const itemId = Transaction.getCurrentItem();
+//       console.log('deleting', itemId);
+//       // HomeUI.deleteRow(itemId);
+//       // Transaction.deleteCurrentItem();
+//       // remove from db - delete when db confirm deletion
+//       ipcRenderer.send('transaction:delete', itemId);
+//     }
+//   }
+// }
 
-document.addEventListener('click', (e) => {
-  dropdownHandler(e);
-  editItemHandler(e);
-  deleteItemHandler(e);
-});
+// document.addEventListener('click', (e) => {
+//   dropdownHandler(e);
+//   editItemHandler(e);
+//   deleteItemHandler(e);
+// });
+HomeUI.rowEventListener();
 
 ipcRenderer.send('home:view:ready');
 
@@ -202,6 +249,12 @@ ipcRenderer.on('home:init', (_, data) => {
   HomeUI.setCurrencyInfo(data.baseCurrency);
   HomeUI.updateTotalBalance(data);
   HomeUI.renderTransactions(data);
+});
+
+ipcRenderer.on('account:init', (_, account) => {
+  // if add new account
+  let data = { account };
+  HomeUI.updateTotalBalance(data);
 });
 
 ipcRenderer.on('home:transaction:update', (_, data) => {
