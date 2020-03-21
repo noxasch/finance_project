@@ -7,13 +7,14 @@ const { Model } = require('./model');
 const registerListener = require('./main.listener');
 // const { CountryISO } = require('./country.iso');
 const Config = require('./config');
+const { files } = require('./constant');
 
 let mainWindow = null;
-const dbname = 'test.db';
+// const dbname = files.databaseFile;
 
 // Config.initDefault();
 const model = Model;
-model.init(dbname);
+model.init(files.databaseFile);
 
 function initMain() {
   const windowOptions = {
