@@ -41,12 +41,15 @@ const HomeUI = (function () {
   }
 
   const dropdownHandler = function (e) {
+    // console.log(e);
     if (e.target.parentNode.classList.contains('dropdown')) {
       if (document.querySelector('.dropdown-menu.show') !== null && document.querySelector('.dropdown-menu.show') !== e.target.nextElementSibling)
         document.querySelector('.dropdown-menu.show').classList.remove('show');
       let itemId = e.target.parentNode.parentNode.parentNode.dataset.id;
-      // itemId = itemId.split('-');
-      Transaction.setCurrentItem(itemId[itemId.length - 1]);
+      // // itemId = itemId.split('-');
+      // console.log(itemId);
+      // // Transaction.setCurrentItem(itemId[itemId.length - 1]);
+      Transaction.setCurrentItem(itemId);
       e.target.nextElementSibling.classList.toggle('show');
     } else if (document.querySelector('.dropdown-menu.show') !== null) {
       document.querySelector('.dropdown-menu.show').classList.remove('show');
@@ -122,7 +125,7 @@ const HomeUI = (function () {
           // console.log(currentAccount);
           // console.log(currentAccount[0]);
           // console.log(currencySymbol);
-          // console.log(item);
+          console.log(item);
           let date = fromUnixTimeStamp(item.transaction_date);
           rows += `<tr class="row" data-id="${item.id}">
             <td class="table-cell">
@@ -186,6 +189,7 @@ const HomeUI = (function () {
 
     rowEventListener: function() {
       document.querySelector(tableSelector).addEventListener('click', (e) => {
+        console.log(e);
         dropdownHandler(e);
         editItemHandler(e);
         deleteItemHandler(e);

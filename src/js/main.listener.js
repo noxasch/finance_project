@@ -7,24 +7,26 @@ let dialogWindow = null;
 let accountWindow = null;
 let transactionId = null;
 
+
+
 function registerListener(db, config, mainWindow) {
-  ipcMain.on('home:view:ready', (event) => {
+
+  function updateTransactionToHomeView() {
     const data = {
       transactions: db.getAllTransaction(10),
       account: db.getAccount(),
       baseCurrency: config.getBaseCurrency()
     }
     mainWindow.send('home:init', data);
+  }
+
+  ipcMain.on('home:view:ready', (event) => {
+    updateTransactionToHomeView();
   });
 
   ipcMain.on('transaction:add', (event, results) => {
     // console.log('ADD TRANSACTION: ', results);
-    // const newTransaction = db.addTransaction(results);
-    // const data = {
-    //   account: db.getAccount(),
-    //   transactions: db.getAllTransaction(10),
-    //   newTransaction: newTransaction
-    // };
+    db.addTransaction(results);
     const data = {
       transactions: db.getAllTransaction(10),
       account: db.getAccount(),
@@ -34,13 +36,9 @@ function registerListener(db, config, mainWindow) {
   });
 
   ipcMain.on('transaction:delete', (event, itemId) => {
-    // console.log('delete', itemId);
+    console.log('delete', itemId);
     db.deleteTransaction(itemId);
-    const data = {
-      account: db.getAllAccount(),
-      transactions: db.getAllTransaction()
-    };
-    event.sender.send('transaction:init', data);
+    updateTransactionToHomeView();
   });
 
   ipcMain.on('transaction:window', (event, itemId) => {
@@ -57,16 +55,16 @@ function registerListener(db, config, mainWindow) {
     event.sender.send('data:init', data);
   });
 
-  ipcMain.on('transaction:update', (event, result) => {
-    db.updateTransaction(result);
-    transactionId = null;
-    // console.log(event);
-    const data = {
-      account: db.getAllAccount(),
-      transactions: db.getAllTransaction(),
-    };
-    mainWindow.send('transaction:init', data);
-  });
+  // ipcMain.on('transaction:update', (event, result) => {
+  //   db.updateTransaction(result);
+  //   transactionId = null;
+  //   // console.log(event);
+  //   const data = {
+  //     account: db.getAllAccount(),
+  //     transactions: db.getAllTransaction(),
+  //   };
+  //   mainWindow.send('transaction:init', data);
+  // });
 
   ipcMain.on('account:window', (_) => {
     accountWindow = WindowDialog.createAccountDialog(mainWindow, path.join('file://', path.resolve(__dirname, '..'), 'html', 'account.window.html'));
@@ -76,9 +74,10 @@ function registerListener(db, config, mainWindow) {
     // console.log(result);
     // db.addAccount(result);
     try {
-      let accountId = db.addAccount(result);
+      db.addAccount(result);
+      // let accountId = db.addAccount(result);
       // console.log(accountId);
-      let account = db.getAccount(accountId);
+      // let account = db.getAccount(accountId);
       mainWindow.send('account:init', db.getAccount());
       // mainWindow.send('index:update', account);
     } catch (error) {
