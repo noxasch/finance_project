@@ -61,7 +61,7 @@ const HomeUI = (function () {
       if (e.target.classList.contains('edit')) {
         const itemId = Transaction.getCurrentItem();
         console.log('edit', itemId);
-        ipcRenderer.send('update:item', itemId);
+        ipcRenderer.send('transaction:window:open', itemId);
       }
     }
   }
@@ -73,8 +73,6 @@ const HomeUI = (function () {
         // remove from display
         const itemId = Transaction.getCurrentItem();
         console.log('deleting', itemId);
-        // HomeUI.deleteRow(itemId);
-        // Transaction.deleteCurrentItem();
         // remove from db - delete when db confirm deletion
         ipcRenderer.send('transaction:delete', itemId);
       }
@@ -189,7 +187,7 @@ const HomeUI = (function () {
 
     rowEventListener: function() {
       document.querySelector(tableSelector).addEventListener('click', (e) => {
-        console.log(e);
+        // console.log(e);
         dropdownHandler(e);
         editItemHandler(e);
         deleteItemHandler(e);

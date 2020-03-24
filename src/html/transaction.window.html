@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+  <title>Update Transaction</title>
+  <link rel="stylesheet" href="../css/main.min.css">
+  <link rel="stylesheet" href="../css/all.min.css">
+</head>
+
+<body style="overflow-y: auto;">
+  <div class="grid-container__middle card card--block">
+    <div class="card__grid">
+  <form class="form-group" id="transaction-form">
+    <div class="input-group">
+      <label for="transaction-input" class="input-group-label">Transaction</label>
+      <div class="select__display">
+        <select name="transaction-type" id="transaction-type" class="form-control" autofocus>
+          <option value="0">Expense</option>
+          <option value="1">Income</option>
+          <option value="2">Transfer</option>
+        </select>
+      </div>
+    </div>
+    <div class="input-group">
+      <label for="account-from" class="input-group-label">Account (from)</label>
+      <div class="select__display">
+        <select name="account-from" id="account-from" class="form-control">
+        </select>
+      </div>
+    </div>
+    <div class="input-group">
+      <label for="amount-input" class="input-group-label">Amount (from)</label>
+      <input type="text" name="amount-from" id="amount-from" class="form-control">
+    </div>
+    <div class="input-group hide">
+      <label for="exrate" class="input-group-label">Exchange Rate</label>
+      <input type="text" name="exrate" id="exrate" class="form-control">
+    </div>
+    <div class="input-group">
+      <label for="account-too" class="input-group-label">Account (to)</label>
+      <div class="select__display">
+        <select name="account-to" id="account-to" class="form-control">
+        </select>
+      </div>
+    </div>
+    <div class="input-group">
+      <label for="amount-input" class="input-group-label">Amount (To)</label>
+      <input type="text" name="amount-to" id="amount-to" class="form-control">
+    </div>
+    <div class="input-group">
+      <label for="date-input" class="input-group-label">Date</label>
+      <input type="date" name="date" id="date-input" class="form-control" required>
+    </div>
+    <div class="input-group">
+      <label for="label-input" class="input-group-label">Payee / Item / Remarks (optional)</label>
+      <input type="text" name="label" id="label-input" class="form-control">
+    </div>
+    <div class="input-group">
+      <label for="category-input" class="input-group-label">Category (optional)</label>
+      <div class="select__display">
+        <select name="category" id="category-input" class="form-control">
+        </select>
+      </div>
+    </div>
+    <div class="btn__group">
+      <button type="button" class="btn btn-grey btn--secondary" id="cancel">Cancel</button>
+      <button type="submit" class="btn">Update</button>
+    </div>
+  </form>
+    </div>
+  </div>
+  <script>
+    require('../js/transaction.window.view');
+  </script>
+</body>
+
+</html>
