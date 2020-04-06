@@ -46,10 +46,11 @@ const HomeUI = (function () {
       if (document.querySelector('.dropdown-menu.show') !== null && document.querySelector('.dropdown-menu.show') !== e.target.nextElementSibling)
         document.querySelector('.dropdown-menu.show').classList.remove('show');
       let itemId = e.target.parentNode.parentNode.parentNode.dataset.id;
+      let transferId = e.target.parentNode.parentNode.parentNode.dataset.transfer_id;
       // // itemId = itemId.split('-');
       // console.log(itemId);
       // // Transaction.setCurrentItem(itemId[itemId.length - 1]);
-      Transaction.setCurrentItem(itemId);
+      Transaction.setCurrentItem({ id: itemId, transfer_id: transferId});
       e.target.nextElementSibling.classList.toggle('show');
     } else if (document.querySelector('.dropdown-menu.show') !== null) {
       document.querySelector('.dropdown-menu.show').classList.remove('show');
@@ -59,9 +60,9 @@ const HomeUI = (function () {
   const editItemHandler = function (e) {
     if (e.target.parentNode.classList.contains('dropdown-menu')) {
       if (e.target.classList.contains('edit')) {
-        const itemId = Transaction.getCurrentItem();
-        console.log('edit', itemId);
-        ipcRenderer.send('transaction:window:open', itemId);
+        const item = Transaction.getCurrentItem();
+        console.log('edit', item);
+        ipcRenderer.send('transaction:window:open', item);
       }
     }
   }
@@ -71,10 +72,10 @@ const HomeUI = (function () {
       if (e.target.classList.contains('delete')) {
         // handle deletion
         // remove from display
-        const itemId = Transaction.getCurrentItem();
-        console.log('deleting', itemId);
+        const item = Transaction.getCurrentItem();
+        console.log('deleting', item);
         // remove from db - delete when db confirm deletion
-        ipcRenderer.send('transaction:delete', itemId);
+        ipcRenderer.send('transaction:delete', item);
       }
     }
   }
@@ -117,15 +118,9 @@ const HomeUI = (function () {
             priceColor = 'text--red';
           }
           let currentAccount = account.filter((acc) => acc.id === item.account_id);
-          // console.log(account);
-          // console.log(item.transaction_date);
-          // console.log(item);
-          // console.log(currentAccount);
-          // console.log(currentAccount[0]);
-          // console.log(currencySymbol);
           console.log(item);
           let date = fromUnixTimeStamp(item.transaction_date);
-          rows += `<tr class="row" data-id="${item.id}">
+          rows += `<tr class="row" data-id="${item.id}" data-transfer_id="${item.transfer_id}">
             <td class="table-cell">
               ${item.label}
               <span class="text--secondary">(${currentAccount[0].name})</span>

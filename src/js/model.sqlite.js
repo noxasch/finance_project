@@ -157,14 +157,13 @@ const ModelSQLite = (function () {
   }
 
   function getAllTransaction(limit = null) {
-    let sql = `SELECT * FROM ${table.transaction} WHERE purged <> 1 ORDER BY date_added DESC, transaction_date DESC`;
+    let sql = `SELECT *, (SELECT id FROM ${table.transaction} ORDER BY id DESC LIMIT 1) as lastRowId FROM ${table.transaction} WHERE purged <> 1 ORDER BY date_added DESC, transaction_date DESC`;
     if (typeof limit === "number") sql += ` LIMIT ${limit}`;
     // console.log(sql);
     let rows = db.prepare(sql).all();
     // console.log(rows);
     return rows;
   }
-  
 
   function addTransaction(obj) {
     let sql = `INSERT INTO ${table.transaction} 

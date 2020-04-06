@@ -6,7 +6,7 @@ const { TransactionHelper } = require('./transaction.helper');
 const Model = (function() {
   let lastItemId = null; 
   let account = null; // temp storage
-  let totalBalance = null;
+  // let totalBalance = null;
 
   function resetAccount(data) {
     account = data;
@@ -22,24 +22,26 @@ const Model = (function() {
 
     addTransaction: function(inputObj) {
       let lastInsertRowid = null;
-      console.log('INPUT OBJ: ', inputObj);
-      const processed = TransactionHelper.processInput(inputObj, lastItemId, account);
-      console.log('PROCESSED:', processed);
-      if (processed.length > 1) {
-        lastInsertRowid = ModelSQLite.addMultipleTransaction(processed);
+      // console.log('INPUT OBJ: ', inputObj);
+      const result = TransactionHelper.processInput(inputObj, lastItemId, account);
+      // console.log('PROCESSED:', result);
+      if (result.length > 1) {
+        lastInsertRowid = ModelSQLite.addMultipleTransaction(result);
         // console.log(lastInsertRowid);
-        return ModelSQLite.getTransactionsByTransferId(processed[0].transferId);
+        return ModelSQLite.getTransactionsByTransferId(result[0].transferId);
       }
-      if (processed.length === 1) {
-        lastInsertRowid = ModelSQLite.addTransaction(processed[0]);
+      if (result.length === 1) {
+        lastInsertRowid = ModelSQLite.addTransaction(result[0]);
         return ModelSQLite.getTransactionById(lastInsertRowid);
       }
+      lastItemId = lastInsertRowid;
     },
 
     getAllTransaction: function(limit = null) {
       const results = ModelSQLite.getAllTransaction(limit);
-      lastItemId = results.length;
-      // console.log('model\n',results);
+      // const results = []
+      // results.forEach
+      lastItemId = results[0].lastRowId;
       return results
     },
 
