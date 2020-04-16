@@ -35,9 +35,9 @@ function registerListener(db, config, mainWindow) {
     mainWindow.send('home:transaction:update', data);
   });
 
-  ipcMain.on('transaction:delete', (event, itemId) => {
-    console.log('delete', itemId);
-    db.deleteTransaction(itemId);
+  ipcMain.on('transaction:delete', (event, item) => {
+    // console.log('delete', item);
+    db.deleteTransaction(item);
     updateTransactionToHomeView();
   });
 

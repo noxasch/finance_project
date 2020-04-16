@@ -1,9 +1,11 @@
 'use strict';
-
+// store account state
+// use in index:home transction list
+// and should be use in transaction list
 const Transaction = (function () {
-  const state = {
-    totalBalance: 0,
-    currentItem: null
+  let currentItem = {
+    id: null,
+    transfer_id: null,
   }
 
   function sumAmount(s) { // parse string equation
@@ -29,15 +31,18 @@ const Transaction = (function () {
     },
 
     setCurrentItem: function (item) {
-      state.currentItem = item;
+      currentItem = item;
     },
 
     getCurrentItem: function () {
-      return state.currentItem;
+      return currentItem
     },
 
     deleteCurrentItem: function () {
-      state.currentItem = null;
+      currentItem = {
+        id: null,
+        transfer_id: null,
+      }
     }
   }
 })();

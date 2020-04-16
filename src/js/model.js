@@ -56,8 +56,16 @@ const Model = (function() {
       return true;
     },
 
-    deleteTransaction: function(itemId) {
-      ModelSQLite.purgeTransaction(itemId);
+    deleteTransaction: function(item) {
+      // if (item)
+      // console.log('model.js', item);
+      // let currItem = item;
+      if (item.transfer_id !== null) {
+        // console.log(item.transfer_id);
+        ModelSQLite.purgeTransactionByTransferId(item.transfer_id);
+      } else {
+        ModelSQLite.purgeTransactionById(item.id);
+      }
       return true;
     },
 

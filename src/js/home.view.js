@@ -129,7 +129,7 @@ const HomeUI = (function () {
             <td class="table-cell ${priceColor}"> ${currencySymbol} ${toLocaleFixed(parseFloat(item.amount))}
               &nbsp;&nbsp;
               <span class="dropdown">
-                <i class="fas fa-ellipsis-v"></i>
+                <i class="fas fa-ellipsis-h"></i>
                 <div class="dropdown-menu dropdown-menu-right">
                   <span class="dropdown__item edit">Edit</span>
                   <span class="dropdown__item delete">Delete</span>

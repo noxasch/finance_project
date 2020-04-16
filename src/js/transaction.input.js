@@ -23,7 +23,7 @@ module.exports.TransactionInputUI = (function () {
     ex_rate: 'exrate'
   }
 
-  function validateAndConvertToMoney(e) {
+  function validateAndConvertToMoney(e) { // for UI display
     if (/[\d\.]+/i.test(e.target.value)) {
       const num = toLocaleFixed(parseFloat(e.target.value.replace(/\,/g, '')));
       const start = e.target.selectionStart;
@@ -34,6 +34,7 @@ module.exports.TransactionInputUI = (function () {
     }
     else if (/[A-Za-z]/i.test(e.target.value)) {
       e.target.setCustomValidity('Amount can only be numbers');
+      document.getElementById(UISelectors.form).reportValidity();
     }
   }
 
@@ -262,8 +263,8 @@ module.exports.TransactionInputUI = (function () {
   return {
 
     initForm: function(data) {
-      console.log(data);
-      // accountStore = data;
+      // console.log(data);
+      accountStore = data;
       resetTransactionOption();
       setTodaysDate();
       resetCategory();

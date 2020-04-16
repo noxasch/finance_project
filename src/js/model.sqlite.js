@@ -214,9 +214,15 @@ const ModelSQLite = (function () {
     db.prepare(sql).run(obj);
   }
 
-  function purgeTransaction(itemId) {
-    let sql = `UPDATE ${table.transaction} SET purged = 1 WHERE id = ?`
+  function purgeTransactionById(itemId) {
+    let sql = `UPDATE ${table.transaction} SET purged = 1 WHERE id = ?`;
     db.prepare(sql).run([itemId]);
+  }
+
+  function purgeTransactionByTransferId(transferId) {
+    // console.log('mode.sqlite', transferId);
+    let sql = `UPDATE ${table.transaction} SET purged = 1 WHERE transfer_id = ?`;
+    db.prepare(sql).run([transferId]);
   }
 
   // get transaction by date range
@@ -244,7 +250,8 @@ const ModelSQLite = (function () {
     getAllTransaction,
     getTransactionById,
     getTransactionsByTransferId,
-    purgeTransaction,
+    purgeTransactionById,
+    purgeTransactionByTransferId,
     updateTransaction,
     getTransactionBetween,
 
