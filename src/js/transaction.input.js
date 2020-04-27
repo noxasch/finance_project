@@ -114,11 +114,13 @@ module.exports.TransactionInputUI = (function () {
 
   function updateAccountFrom(data) {
     const select = document.getElementById(UISelectors.accountFrom);
+    const selected = select.value;
     while (select.firstChild) select.removeChild(select.firstChild);
     let fragment = document.createDocumentFragment();
     data.forEach((item) => {
       // console.log(item);
       const opt = document.createElement('option');
+      if (parseInt(item.id) === parseInt(selected)) opt.setAttribute('selected', true);
       opt.value = item.id;
       opt.textContent = item.name;
       fragment.appendChild(opt);
@@ -128,12 +130,14 @@ module.exports.TransactionInputUI = (function () {
   }
 
   function updateAccountTo(data) {
-    const select = document.getElementById(UISelectors.accountTo)
+    const select = document.getElementById(UISelectors.accountTo);
+    const selected = select.value;
     while (select.firstChild) select.removeChild(select.firstChild);
     let fragment = document.createDocumentFragment();
     data.forEach((item) => {
       // console.log(item);
       const opt = document.createElement('option');
+      if (parseInt(item.id) === parseInt(selected)) opt.setAttribute('selected', true);
       opt.value = item.id;
       opt.textContent = item.name;
       fragment.appendChild(opt);
